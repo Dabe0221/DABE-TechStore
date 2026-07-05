@@ -171,7 +171,34 @@ public String adminDashboard(Model model) {
 
 model.addAttribute("ordersToday", ordersToday);
 
+java.time.LocalDate today = java.time.LocalDate.now();
 
+java.time.LocalDate chartEndDate = orders.stream()
+        .filter(order -> order.getOrderDate() != null)
+        .map(order -> order.getOrderDate().toLocalDate())
+        .max(java.time.LocalDate::compareTo)
+        .orElse(java.time.LocalDate.now());
+
+java.util.List<String> revenueLabels = new java.util.ArrayList<>();
+java.util.List<Double> revenueData = new java.util.ArrayList<>();
+
+for (int i = 6; i >= 0; i--) {
+    java.time.LocalDate date = chartEndDate.minusDays(i);
+
+    java.math.BigDecimal dailyRevenue = orders.stream()
+            .filter(order -> order.getOrderDate() != null)
+            .filter(order -> order.getTotalAmount() != null)
+            .filter(order -> !"Cancelled".equals(order.getStatus()))
+            .filter(order -> order.getOrderDate().toLocalDate().equals(date))
+            .map(Order::getTotalAmount)
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+    revenueLabels.add(date.getMonthValue() + "/" + date.getDayOfMonth());
+    revenueData.add(dailyRevenue.doubleValue());
+}
+
+model.addAttribute("revenueLabels", revenueLabels);
+model.addAttribute("revenueData", revenueData);
     return "admin-dashboard";
 }
 
