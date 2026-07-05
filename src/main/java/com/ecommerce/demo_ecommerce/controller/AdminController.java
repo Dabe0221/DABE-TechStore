@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ecommerce.demo_ecommerce.service.ProductService;
+import com.ecommerce.demo_ecommerce.repository.OrderItemRepository;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,9 @@ import com.ecommerce.demo_ecommerce.entity.Order;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
+import com.ecommerce.demo_ecommerce.entity.OrderItem;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 
 
@@ -32,17 +36,22 @@ public class AdminController {
     private final UserRepository userRepository;
     private final ProductService productService;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @GetMapping("/admin/orders")
 public String adminOrders(Model model) {
     model.addAttribute("orders", orderRepository.findAll());
     return "admin-orders";
 }
-    public AdminController(ProductService productService, OrderRepository orderRepository,UserRepository userRepository) {
-        this.productService = productService;
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-    }
+    public AdminController(ProductService productService,
+                       OrderRepository orderRepository,
+                       UserRepository userRepository,
+                       OrderItemRepository orderItemRepository) {
+    this.productService = productService;
+    this.orderRepository = orderRepository;
+    this.userRepository = userRepository;
+    this.orderItemRepository = orderItemRepository;
+}
 
     
 
@@ -199,7 +208,25 @@ for (int i = 6; i >= 0; i--) {
 
 model.addAttribute("revenueLabels", revenueLabels);
 model.addAttribute("revenueData", revenueData);
+var topSellingProducts = orderItemRepository.findAll()
+        .stream()
+        .collect(Collectors.groupingBy(
+                OrderItem::getProductName,
+                Collectors.summingInt(OrderItem::getQuantity)
+        ))
+        .entrySet()
+        .stream()
+        .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+        .limit(5)
+        .map(entry -> new Object[]{entry.getKey(), entry.getValue()})
+        .toList();
+
+System.out.println("===== TOP SELLING PRODUCTS =====");
+topSellingProducts.forEach(item ->
+        System.out.println(item[0] + " : " + item[1]));
+
+model.addAttribute("topSellingProducts", topSellingProducts);
     return "admin-dashboard";
 }
-
+        
 }

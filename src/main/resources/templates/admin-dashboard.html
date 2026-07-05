@@ -91,8 +91,8 @@
                 </div>
             </div>
         </div>
-
-        <div class="card shadow mb-5">
+    </div>
+ <div class="card shadow mb-5">
     <div class="card-header bg-dark text-white">
         📈 Revenue This Week
     </div>
@@ -101,77 +101,105 @@
         <canvas id="revenueChart" height="100"></canvas>
     </div>
 </div>
+   <!-- TABLES -->
+<div class="row g-4">
 
-    </div>
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                ⚠ Low Stock Products
+            </div>
 
-    <!-- TABLES -->
-    <div class="row g-4">
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Stock</th>
+                    </tr>
+                    </thead>
 
-        <div class="col-lg-6">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white">
-                    ⚠ Low Stock Products
-                </div>
-
-                <div class="card-body">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-dark">
-                        <tr>
-                            <th>Product</th>
-                            <th>Stock</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        <tr th:each="product : ${lowStockProducts}">
-                            <td th:text="${product.name}"></td>
-                            <td>
-                                <span class="badge bg-danger"
-                                      th:text="${product.stock}">
-                                </span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <tbody>
+                    <tr th:each="product : ${lowStockProducts}">
+                        <td th:text="${product.name}"></td>
+                        <td>
+                            <span class="badge bg-danger"
+                                  th:text="${product.stock}">
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
 
-        <div class="col-lg-6">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white">
-                    🧾 Recent Orders
-                </div>
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                🏆 Top Selling Products
+            </div>
 
-                <div class="card-body">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Customer</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                        </tr>
-                        </thead>
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Sold</th>
+                    </tr>
+                    </thead>
 
-                        <tbody>
-                        <tr th:each="order : ${recentOrders}">
-                            <td th:text="${order.id}"></td>
-                            <td th:text="${order.customerName}"></td>
-                            <td>₱<span th:text="${order.totalAmount}"></span></td>
-                            <td>
-                                <span class="badge bg-warning text-dark"
-                                      th:text="${order.status}">
-                                </span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <tbody>
+                    <tr th:each="item : ${topSellingProducts}">
+                        <td th:text="${item[0]}">Product</td>
+                        <td>
+                            <span class="badge bg-success"
+                                  th:text="${item[1]}">
+                                0
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-
     </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                🧾 Recent Orders
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="order : ${recentOrders}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.customerName}"></td>
+                        <td>₱<span th:text="${order.totalAmount}"></span></td>
+                        <td>
+                            <span class="badge bg-warning text-dark"
+                                  th:text="${order.status}">
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
 
     <!-- BUTTONS -->
     <div class="mt-5">
