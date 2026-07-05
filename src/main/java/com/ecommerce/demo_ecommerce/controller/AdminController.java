@@ -162,6 +162,16 @@ public String adminDashboard(Model model) {
 
                 model.addAttribute("totalCustomers", userRepository.count());
 
+                long ordersToday = orders.stream()
+        .filter(order -> order.getOrderDate() != null)
+        .filter(order -> order.getOrderDate()
+                .toLocalDate()
+                .equals(java.time.LocalDate.now()))
+        .count();
+
+model.addAttribute("ordersToday", ordersToday);
+
+
     return "admin-dashboard";
 }
 
