@@ -1,0 +1,590 @@
+/* ==================================================
+   TechStore - Modern E-Commerce CSS
+   ================================================== */
+
+:root{
+    --primary:#0d6efd;
+    --secondary:#ffc107;
+    --dark:#212529;
+    --light:#f8f9fa;
+    --gray:#6c757d;
+    --success:#198754;
+    --danger:#dc3545;
+    --shadow:0 8px 25px rgba(0,0,0,.10);
+    --radius:15px;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f6f9;
+    color:#222;
+    overflow-x:hidden;
+}
+
+/* ===================== NAVBAR ===================== */
+
+.navbar{
+    padding:15px 0;
+}
+
+.navbar-brand{
+    font-size:1.8rem;
+    font-weight:bold;
+}
+
+.navbar-brand i{
+    color:var(--secondary);
+    margin-right:8px;
+}
+
+.nav-link{
+    color:white!important;
+    transition:.3s;
+}
+
+.nav-link:hover{
+    color:var(--secondary)!important;
+}
+
+.navbar input{
+    border-radius:30px;
+    padding:10px 20px;
+}
+
+.navbar .btn{
+    border-radius:30px;
+}
+
+/* ===================== CATEGORY BAR ===================== */
+
+.bg-light a{
+    text-decoration:none;
+    color:#333;
+    font-weight:600;
+    transition:.3s;
+}
+
+.bg-light a:hover{
+    color:var(--primary);
+}
+
+/* ===================== HERO ===================== */
+
+.hero{
+    background:linear-gradient(135deg,#0d6efd,#6610f2);
+    color:white;
+    padding:90px 0;
+}
+
+.hero h1{
+    font-size:3rem;
+    font-weight:bold;
+}
+
+.hero p{
+    font-size:1.2rem;
+    margin:25px 0;
+}
+
+.hero img{
+    border-radius:20px;
+    box-shadow:var(--shadow);
+}
+
+.hero .btn{
+    padding:14px 40px;
+    border-radius:40px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.hero .btn:hover{
+    transform:translateY(-4px);
+}
+
+/* ===================== SECTION TITLES ===================== */
+
+h2{
+    font-weight:bold;
+}
+
+/* ===================== PRODUCT CARD ===================== */
+
+.product-card{
+
+    border:none;
+
+    border-radius:var(--radius);
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+
+    transition:.35s;
+
+    background:white;
+
+}
+
+.product-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.18);
+
+}
+
+.product-card img{
+
+    height:230px;
+
+    object-fit:cover;
+
+    transition:.4s;
+
+}
+
+.product-card:hover img{
+
+    transform:scale(1.08);
+
+}
+
+.product-card .card-body{
+
+    padding:20px;
+
+}
+
+.product-card h5{
+
+    font-weight:bold;
+
+    margin-bottom:10px;
+
+}
+
+.product-card h4{
+
+    color:var(--primary);
+
+    margin:15px 0;
+
+    font-weight:bold;
+
+}
+
+.product-card p{
+
+    color:var(--gray);
+
+    min-height:60px;
+
+}
+
+.rating{
+
+    color:gold;
+
+    font-size:18px;
+
+    margin-bottom:10px;
+
+}
+
+.product-card button{
+
+    border-radius:30px;
+
+    transition:.3s;
+
+}
+
+.product-card button:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* ===================== BADGES ===================== */
+
+.badge-sale{
+
+    position:absolute;
+
+    top:15px;
+
+    left:15px;
+
+    background:red;
+
+    color:white;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+}
+
+/* ===================== NEWSLETTER ===================== */
+
+.newsletter{
+
+    background:white;
+
+    padding:80px 20px;
+
+}
+
+.newsletter h2{
+
+    margin-bottom:15px;
+
+}
+
+.newsletter p{
+
+    color:#666;
+
+    margin-bottom:25px;
+
+}
+
+.newsletter input{
+
+    height:55px;
+
+}
+
+.newsletter button{
+
+    font-weight:bold;
+
+}
+
+/* ===================== FOOTER ===================== */
+
+footer{
+
+    background:#1d1d1d;
+
+    color:white;
+
+    padding:60px 0 20px;
+
+}
+
+footer h4,
+
+footer h5{
+
+    margin-bottom:20px;
+
+}
+
+footer ul{
+
+    list-style:none;
+
+    padding:0;
+
+}
+
+footer li{
+
+    margin-bottom:10px;
+
+    color:#bbb;
+
+}
+
+footer i{
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+footer i:hover{
+
+    color:var(--secondary);
+
+}
+
+footer hr{
+
+    margin:30px 0;
+
+}
+
+/* ===================== BUTTONS ===================== */
+
+.btn-primary{
+
+    background:var(--primary);
+
+    border:none;
+
+}
+
+.btn-primary:hover{
+
+    background:#0b5ed7;
+
+}
+
+.btn-warning{
+
+    font-weight:bold;
+
+}
+
+/* ===================== SEARCH ===================== */
+
+input:focus{
+
+    box-shadow:none!important;
+
+    border-color:var(--primary)!important;
+
+}
+
+/* ===================== SCROLLBAR ===================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:var(--primary);
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#eee;
+
+}
+
+/* ===================== ANIMATIONS ===================== */
+
+.product-card{
+
+    animation:fadeUp .8s ease;
+
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.hero img{
+
+    animation:float 4s infinite ease-in-out;
+
+}
+
+@keyframes float{
+
+    0%{
+
+        transform:translateY(0);
+
+    }
+
+    50%{
+
+        transform:translateY(-10px);
+
+    }
+
+    100%{
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media(max-width:992px){
+
+.hero{
+
+text-align:center;
+
+}
+
+.hero h1{
+
+font-size:2.3rem;
+
+}
+
+.hero img{
+
+margin-top:40px;
+
+}
+
+.navbar form{
+
+width:100%!important;
+
+margin:15px 0!important;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.hero{
+
+padding:60px 20px;
+
+}
+
+.hero h1{
+
+font-size:2rem;
+
+}
+
+.product-card img{
+
+height:200px;
+
+}
+
+footer{
+
+text-align:center;
+
+}
+
+}
+
+@media(max-width:576px){
+
+.navbar-brand{
+
+font-size:1.5rem;
+
+}
+
+.hero h1{
+
+font-size:1.7rem;
+
+}
+
+.hero p{
+
+font-size:1rem;
+
+}
+
+.newsletter{
+
+padding:50px 20px;
+
+}
+
+}
+
+/* ===================== HOVER EFFECTS ===================== */
+
+.card:hover h5{
+    color:var(--primary);
+}
+
+.card:hover h4{
+    color:var(--success);
+}
+
+.card{
+    cursor:pointer;
+}
+
+.shadow-hover:hover{
+    box-shadow:0 12px 30px rgba(0,0,0,.20);
+}
+
+/* ===================== UTILITIES ===================== */
+
+.rounded-xl{
+    border-radius:20px;
+}
+
+.text-primary{
+    color:var(--primary)!important;
+}
+
+.text-warning{
+    color:var(--secondary)!important;
+}
+
+.bg-primary-gradient{
+    background:linear-gradient(135deg,#0d6efd,#6610f2);
+}
+
+.toast-message{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#198754;
+    color:white;
+    padding:15px 25px;
+    border-radius:10px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+    opacity:0;
+    transform:translateY(20px);
+    transition:.3s;
+    z-index:9999;
+}
+
+.toast-message.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.dark-mode{
+    background:#181818;
+    color:#f8f9fa;
+}
