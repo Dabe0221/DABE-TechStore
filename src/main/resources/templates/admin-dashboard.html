@@ -134,6 +134,36 @@
         </div>
     </div>
 
+    <div class="card shadow mt-4">
+    <div class="card-header bg-dark text-white">
+        ⭐ Highest Rated Products
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>Product</th>
+                <th>Rating</th>
+                <th>Reviews</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="item : ${highestRatedProducts}">
+                <td th:text="${item[0]}">Product</td>
+                <td>
+                    ⭐ <span th:text="${#numbers.formatDecimal(item[1], 1, 1)}">0.0</span>
+                </td>
+                <td>
+                    <span class="badge bg-primary" th:text="${item[2]}">0</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
     <div class="col-lg-4">
         <div class="card shadow">
             <div class="card-header bg-dark text-white">

@@ -21,6 +21,7 @@ import java.io.IOException;
 import com.ecommerce.demo_ecommerce.entity.OrderItem;
 import java.util.Comparator;
 import java.util.stream.Collectors;
+import com.ecommerce.demo_ecommerce.repository.ReviewRepository;
 
 
 
@@ -37,6 +38,7 @@ public class AdminController {
     private final ProductService productService;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final ReviewRepository reviewRepository;
 
     @GetMapping("/admin/orders")
 public String adminOrders(Model model) {
@@ -46,11 +48,13 @@ public String adminOrders(Model model) {
     public AdminController(ProductService productService,
                        OrderRepository orderRepository,
                        UserRepository userRepository,
-                       OrderItemRepository orderItemRepository) {
+                       OrderItemRepository orderItemRepository,
+                       ReviewRepository reviewRepository) {
     this.productService = productService;
     this.orderRepository = orderRepository;
     this.userRepository = userRepository;
     this.orderItemRepository = orderItemRepository;
+    this.reviewRepository = reviewRepository;
 }
 
     
@@ -226,6 +230,12 @@ topSellingProducts.forEach(item ->
         System.out.println(item[0] + " : " + item[1]));
 
 model.addAttribute("topSellingProducts", topSellingProducts);
+
+model.addAttribute("highestRatedProducts",
+        reviewRepository.findHighestRatedProducts()
+                .stream()
+                .limit(5)
+                .toList());
     return "admin-dashboard";
 }
         
