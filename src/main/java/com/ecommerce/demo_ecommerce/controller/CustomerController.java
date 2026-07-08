@@ -4,6 +4,7 @@ import com.ecommerce.demo_ecommerce.repository.OrderRepository;
 import com.ecommerce.demo_ecommerce.repository.UserRepository;
 import com.ecommerce.demo_ecommerce.entity.Order;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import com.ecommerce.demo_ecommerce.entity.Product;
@@ -75,7 +76,7 @@ public String updateProfile(@ModelAttribute User formUser,
     return "redirect:/my-profile";
 }
      @GetMapping("/my-orders/{id}")
-public String myOrderDetails(@PathVariable Long id,
+public String myOrderDetails(@PathVariable @NonNull Long id,
                            Authentication authentication,
                              Model model) {
 
@@ -139,4 +140,22 @@ public String myWishlist(Authentication authentication, Model model) {
 
     return "wishlist";
 }
+ @GetMapping("/my-orders/{id}/invoice")
+public String myOrderInvoice(@PathVariable Long id,
+                             Authentication authentication,
+                             Model model) {
+
+    String email = authentication.getName();
+
+    Order order = orderRepository.findById(id).orElse(null);
+
+    if (order == null || !order.getEmail().equals(email)) {
+        return "redirect:/my-orders";
+    }
+
+    model.addAttribute("order", order);
+
+    return "invoice";
+}
+
 }

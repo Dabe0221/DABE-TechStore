@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.ecommerce.demo_ecommerce.entity.Product;
+import com.ecommerce.demo_ecommerce.repository.ProductRepository;
 
 import java.util.List;
 import java.time.LocalDateTime;
@@ -21,11 +23,13 @@ import java.util.ArrayList;
 public class CheckoutController {
 
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
-    public CheckoutController(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-
+    public CheckoutController(OrderRepository orderRepository,
+                          ProductRepository productRepository) {
+    this.orderRepository = orderRepository;
+    this.productRepository = productRepository;
+}
     private ShoppingCart getCart(HttpSession session) {
         return (ShoppingCart) session.getAttribute("cart");
     }
@@ -66,17 +70,30 @@ public String placeOrder(@ModelAttribute Order order, HttpSession session) {
     List<OrderItem> orderItems = new ArrayList<>();
 
     for (CartItem cartItem : cart.getItems()) {
-        OrderItem item = new OrderItem();
+    Product product = productRepository.findById(cartItem.getProduct().getId())
+            .orElse(null);
 
-        item.setProductName(cartItem.getProduct().getName());
-        item.setPrice(cartItem.getProduct().getPrice());
-        item.setQuantity(cartItem.getQuantity());
-        item.setSubtotal(cartItem.getSubtotal());
-        item.setOrder(order);
-
-        orderItems.add(item);
+    if (product == null) {
+        continue;
     }
 
+    if (product.getStock() < cartItem.getQuantity()) {
+        return "redirect:/cart";
+    }
+
+    OrderItem item = new OrderItem();
+
+    item.setProductName(product.getName());
+    item.setPrice(product.getPrice());
+    item.setQuantity(cartItem.getQuantity());
+    item.setSubtotal(cartItem.getSubtotal());
+    item.setOrder(order);
+
+    product.setStock(product.getStock() - cartItem.getQuantity());
+    productRepository.save(product);
+
+    orderItems.add(item);
+}
     order.setItems(orderItems);
 
     orderRepository.save(order);

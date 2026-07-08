@@ -85,6 +85,13 @@
         Total: ₱<span th:text="${order.totalAmount}"></span>
     </h3>
 
+    <a th:href="@{/my-orders/{id}/invoice(id=${order.id})}"
+   class="btn btn-dark">
+
+    🧾 Invoice
+
+</a>
+
 </div>
 </body>
 </html>
