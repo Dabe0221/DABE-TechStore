@@ -21,6 +21,9 @@ public class Order {
     private BigDecimal totalAmount;
     private LocalDateTime orderDate;
     private String status;
+   
+    @Column(name = "payment_method")
+    private String paymentMethod;
 
     public Long getId() {
         return id;
@@ -92,4 +95,13 @@ public List<OrderItem> getItems() {
 public void setItems(List<OrderItem> items) {
     this.items = items;
 }
+
+public String getPaymentMethod() {
+    return paymentMethod;
+}
+
+public void setPaymentMethod(String paymentMethod) {
+    this.paymentMethod = paymentMethod;
+}
+
 }
