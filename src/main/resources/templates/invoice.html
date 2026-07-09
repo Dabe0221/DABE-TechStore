@@ -85,7 +85,24 @@
 <br>
 
 <strong>Payment Status:</strong>
-<span th:text="${order.paymentStatus}">Pending</span>
+
+<span
+    th:if="${order.paymentStatus == 'Paid'}"
+    class="badge bg-success">
+    Paid
+</span>
+
+<span
+    th:if="${order.paymentStatus == 'Pending Payment'}"
+    class="badge bg-warning text-dark">
+    Pending Payment
+</span>
+
+<span
+    th:if="${order.paymentStatus == 'Unpaid'}"
+    class="badge bg-danger">
+    Unpaid
+</span>
 <br>
 
     <p>

@@ -85,6 +85,12 @@
         Total: ₱<span th:text="${order.totalAmount}"></span>
     </h3>
 
+    <a th:if="${order.paymentStatus == 'Pending Payment'}"
+   th:href="@{/payment/{id}(id=${order.id})}"
+   class="btn btn-success">
+    Pay Now
+</a>
+
     <a th:href="@{/my-orders/{id}/invoice(id=${order.id})}"
    class="btn btn-dark">
 

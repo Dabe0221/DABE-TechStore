@@ -154,9 +154,28 @@ public String payOrder(@PathVariable Long id) {
     }
 
     order.setPaymentStatus("Paid");
+
+    if ("Pending".equals(order.getStatus())) {
+        order.setStatus("Processing");
+    }
+
     orderRepository.save(order);
 
-    return "redirect:/my-orders/" + id + "/invoice";
+    return "redirect:/payment/" + id + "/success";
+}
+
+@GetMapping("/payment/{id}/success")
+public String paymentSuccess(@PathVariable Long id, Model model) {
+
+    Order order = orderRepository.findById(id).orElse(null);
+
+    if (order == null) {
+        return "redirect:/";
+    }
+
+    model.addAttribute("order", order);
+
+    return "payment-success";
 }
 
 }
