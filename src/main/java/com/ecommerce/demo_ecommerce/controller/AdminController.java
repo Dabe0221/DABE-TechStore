@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ecommerce.demo_ecommerce.service.ProductService;
 import com.ecommerce.demo_ecommerce.repository.OrderItemRepository;
+import com.ecommerce.demo_ecommerce.service.EmailService;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import com.ecommerce.demo_ecommerce.entity.OrderItem;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 import com.ecommerce.demo_ecommerce.repository.ReviewRepository;
 
@@ -39,22 +39,24 @@ public class AdminController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ReviewRepository reviewRepository;
-
+    private final EmailService emailService;
     @GetMapping("/admin/orders")
 public String adminOrders(Model model) {
     model.addAttribute("orders", orderRepository.findAll());
     return "admin-orders";
 }
-    public AdminController(ProductService productService,
+   public AdminController(ProductService productService,
                        OrderRepository orderRepository,
                        UserRepository userRepository,
                        OrderItemRepository orderItemRepository,
-                       ReviewRepository reviewRepository) {
+                       ReviewRepository reviewRepository,
+                       EmailService emailService) {
     this.productService = productService;
     this.orderRepository = orderRepository;
     this.userRepository = userRepository;
     this.orderItemRepository = orderItemRepository;
     this.reviewRepository = reviewRepository;
+    this.emailService = emailService;
 }
 
     
@@ -238,5 +240,40 @@ model.addAttribute("highestRatedProducts",
                 .toList());
     return "admin-dashboard";
 }
-        
+
+@PostMapping("/admin/orders/{id}/resend-email")
+public String resendOrderEmail(@PathVariable Long id) {
+
+    Order order = orderRepository.findById(id).orElse(null);
+
+    if (order != null) {
+        emailService.sendOrderConfirmation(
+                order.getEmail(),
+                order.getId(),
+                order.getCustomerName(),
+                order.getPaymentMethod(),
+                order.getPaymentStatus(),
+                order.getStatus()
+        );
+    }
+
+    return "redirect:/admin/orders";
+}
+        @PostMapping("/admin/orders/{id}/mark-paid")
+public String markOrderPaid(@PathVariable Long id) {
+
+    Order order = orderRepository.findById(id).orElse(null);
+
+    if (order != null) {
+        order.setPaymentStatus("Paid");
+
+        if ("Pending".equals(order.getStatus())) {
+            order.setStatus("Processing");
+        }
+
+        orderRepository.save(order);
+    }
+
+    return "redirect:/admin/orders";
+}
 }

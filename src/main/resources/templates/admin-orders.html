@@ -14,43 +14,106 @@
         <a href="/admin/products" class="btn btn-secondary">Products</a>
     </div>
 
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
-        <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Action</th>
-        </tr>
-        </thead>
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+    <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Total</th>
+        <th>Payment</th>
+        <th>Payment Status</th>
+        <th>Order Status</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
 
-        <tbody>
-        <tr th:each="order : ${orders}">
-            <td th:text="${order.id}">1</td>
-            <td th:text="${order.customerName}">Customer</td>
-            <td th:text="${order.email}">Email</td>
-            <td th:text="${order.phone}">Phone</td>
-            <td>₱<span th:text="${order.totalAmount}">0</span></td>
-            <td>
-                <span class="badge bg-warning text-dark" th:text="${order.status}">
-                    Pending
-                </span>
-            </td>
-            <td th:text="${order.orderDate}">Date</td>
+    <tbody>
+    <tr th:each="order : ${orders}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.customerName}"></td>
 
-            <td>
+        <td>
+            ₱<span th:text="${order.totalAmount}"></span>
+        </td>
+
+        <td th:text="${order.paymentMethod}"></td>
+
+        <td>
+            <span th:if="${order.paymentStatus == 'Paid'}"
+                  class="badge bg-success">
+                Paid
+            </span>
+
+            <span th:if="${order.paymentStatus == 'Pending Payment'}"
+                  class="badge bg-warning text-dark">
+                Pending Payment
+            </span>
+
+            <span th:if="${order.paymentStatus == 'Unpaid'}"
+                  class="badge bg-danger">
+                Unpaid
+            </span>
+        </td>
+
+        <td>
+            <span th:if="${order.status == 'Pending'}"
+                  class="badge bg-warning text-dark">
+                Pending
+            </span>
+
+            <span th:if="${order.status == 'Processing'}"
+                  class="badge bg-primary">
+                Processing
+            </span>
+
+            <span th:if="${order.status == 'Shipped'}"
+                  class="badge bg-info text-dark">
+                Shipped
+            </span>
+
+            <span th:if="${order.status == 'Delivered'}"
+                  class="badge bg-success">
+                Delivered
+            </span>
+
+            <span th:if="${order.status == 'Cancelled'}"
+                  class="badge bg-danger">
+                Cancelled
+            </span>
+        </td>
+
+       <td>
     <a th:href="@{/admin/order-details(id=${order.id})}"
-   class="btn btn-primary btn-sm">
-    View
-</a>
+       class="btn btn-sm btn-dark">
+        View
+    </a>
+
+    <a th:href="@{/my-orders/{id}/invoice(id=${order.id})}"
+       class="btn btn-sm btn-secondary">
+        Invoice
+    </a>
+
+    <form th:action="@{/admin/orders/{id}/resend-email(id=${order.id})}"
+      method="post"
+      style="display:inline;">
+    <button class="btn btn-sm btn-warning">
+        Resend Email
+    </button>
+</form>
+
+<form th:if="${order.paymentStatus != 'Paid'}"
+      th:action="@{/admin/orders/{id}/mark-paid(id=${order.id})}"
+      method="post"
+      style="display:inline;">
+    <button class="btn btn-sm btn-success">
+        Mark Paid
+    </button>
+</form>
+
 </td>
-        </tr>
-        </tbody>
-    </table>
+    </tr>
+    </tbody>
+</table>
 
     <a href="/" class="btn btn-primary">Back to Store</a>
 

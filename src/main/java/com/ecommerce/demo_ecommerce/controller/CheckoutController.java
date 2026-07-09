@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.ecommerce.demo_ecommerce.entity.Product;
 import com.ecommerce.demo_ecommerce.repository.ProductRepository;
+import com.ecommerce.demo_ecommerce.service.EmailService;
 
 import java.util.List;
 import java.time.LocalDateTime;
@@ -25,12 +26,16 @@ public class CheckoutController {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final EmailService emailService;
 
-    public CheckoutController(OrderRepository orderRepository,
-                          ProductRepository productRepository) {
+   public CheckoutController(OrderRepository orderRepository,
+                          ProductRepository productRepository,
+                          EmailService emailService) {
     this.orderRepository = orderRepository;
     this.productRepository = productRepository;
+    this.emailService = emailService;
 }
+
     private ShoppingCart getCart(HttpSession session) {
         return (ShoppingCart) session.getAttribute("cart");
     }
@@ -112,13 +117,28 @@ if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
 }
     order.setItems(orderItems);
 
+
     orderRepository.save(order);
+
+    
+if ("Cash on Delivery".equalsIgnoreCase(order.getPaymentMethod())) {
+
+    emailService.sendOrderConfirmation(
+            order.getEmail(),
+            order.getId(),
+            order.getCustomerName(),
+            order.getPaymentMethod(),
+            order.getPaymentStatus(),
+            order.getStatus()
+    );
 
     session.removeAttribute("cart");
 
-    if ("Cash on Delivery".equalsIgnoreCase(order.getPaymentMethod())) {
     return "redirect:/order-success";
 }
+
+session.removeAttribute("cart");
+
 
 return "redirect:/payment/" + order.getId();
 
@@ -159,7 +179,18 @@ public String payOrder(@PathVariable Long id) {
         order.setStatus("Processing");
     }
 
+
+
     orderRepository.save(order);
+
+    emailService.sendOrderConfirmation(
+        order.getEmail(),
+        order.getId(),
+        order.getCustomerName(),
+        order.getPaymentMethod(),
+        order.getPaymentStatus(),
+        order.getStatus()
+);
 
     return "redirect:/payment/" + id + "/success";
 }
