@@ -12,9 +12,10 @@
 
 <div class="container my-5">
 
-    <div class="card shadow mx-auto" style="max-width: 600px;">
+    <div class="card shadow mx-auto" style="max-width: 700px;">
+
         <div class="card-header bg-dark text-white">
-            Payment Simulation
+            Secure Payment
         </div>
 
         <div class="card-body">
@@ -31,26 +32,75 @@
                 ₱<span th:text="${order.totalAmount}"></span>
             </p>
 
-            <div th:if="${order.paymentMethod == 'GCash'}" class="alert alert-info">
-                Scan the simulated GCash QR code below.
-                <div class="text-center mt-3">
-                    <div style="font-size: 90px;">📱</div>
-                    <strong>GCash QR Simulation</strong>
+            <hr>
+
+            <!-- GCASH -->
+            <div th:if="${order.paymentMethod == 'GCash'}" class="text-center">
+
+                <h5>GCash Payment</h5>
+
+                <div class="border rounded p-4 my-3 bg-white d-inline-block">
+                    <div style="font-size: 90px;">▣</div>
+                    <div style="font-size: 70px;">▦</div>
+                    <strong>Simulated QR Code</strong>
                 </div>
+
+                <p class="text-muted">
+                    Open your GCash app and scan this simulated QR code.
+                </p>
+
             </div>
 
-            <div th:if="${order.paymentMethod == 'PayPal'}" class="alert alert-primary">
-                PayPal payment simulation.
+            <!-- PAYPAL -->
+            <div th:if="${order.paymentMethod == 'PayPal'}" class="text-center">
+
+                <h5>PayPal Payment</h5>
+
+                <div class="alert alert-primary">
+                    You will be redirected to PayPal simulation.
+                </div>
+
+                <button type="button" class="btn btn-primary mb-3">
+                    Continue with PayPal
+                </button>
+
             </div>
 
-            <div th:if="${order.paymentMethod == 'Credit/Debit Card'}" class="alert alert-secondary">
-                Card payment simulation.
+            <!-- CARD -->
+            <div th:if="${order.paymentMethod == 'Credit/Debit Card'}">
+
+                <h5>Card Payment</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Card Number</label>
+                    <input class="form-control" value="4111 1111 1111 1111" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Card Holder</label>
+                    <input class="form-control" value="DABE TECHSTORE TEST" readonly>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Expiry</label>
+                        <input class="form-control" value="12/30" readonly>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CVV</label>
+                        <input class="form-control" value="123" readonly>
+                    </div>
+                </div>
+
             </div>
 
             <form th:action="@{/payment/{id}/pay(id=${order.id})}" method="post">
-                <button class="btn btn-success w-100">
-                    Pay Now
+
+                <button class="btn btn-success w-100 btn-lg">
+                    Pay ₱<span th:text="${order.totalAmount}"></span>
                 </button>
+
             </form>
 
             <a th:href="@{/my-orders/{id}/invoice(id=${order.id})}"
