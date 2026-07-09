@@ -25,6 +25,9 @@ public class Order {
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    @Column(name = "payment_status")
+      private String paymentStatus;
+
     public Long getId() {
         return id;
     }
@@ -102,6 +105,14 @@ public String getPaymentMethod() {
 
 public void setPaymentMethod(String paymentMethod) {
     this.paymentMethod = paymentMethod;
+}
+
+ public String getPaymentStatus() {
+    return paymentStatus;
+}
+
+public void setPaymentStatus(String paymentStatus) {
+    this.paymentStatus = paymentStatus;
 }
 
 }

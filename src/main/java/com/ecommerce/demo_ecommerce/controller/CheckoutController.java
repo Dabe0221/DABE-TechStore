@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.ecommerce.demo_ecommerce.cart.CartItem;
 import com.ecommerce.demo_ecommerce.entity.OrderItem;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,7 +66,22 @@ public String placeOrder(@ModelAttribute Order order, HttpSession session) {
     order.setEmail(auth.getName());
     order.setTotalAmount(cart.getTotal());
     order.setOrderDate(LocalDateTime.now());
-    order.setStatus("Pending");
+    order.setStatus("Pending"); 
+    String paymentMethod = order.getPaymentMethod();
+
+if (paymentMethod == null || paymentMethod.isBlank()) {
+    paymentMethod = "Cash on Delivery";
+}
+
+order.setPaymentMethod(paymentMethod);
+
+if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
+    order.setPaymentStatus("Unpaid");
+} else {
+    order.setPaymentStatus("Pending Payment");
+}
+
+    
 
     List<OrderItem> orderItems = new ArrayList<>();
 
@@ -100,7 +116,11 @@ public String placeOrder(@ModelAttribute Order order, HttpSession session) {
 
     session.removeAttribute("cart");
 
+    if ("Cash on Delivery".equalsIgnoreCase(order.getPaymentMethod())) {
     return "redirect:/order-success";
+}
+
+return "redirect:/payment/" + order.getId();
 
     
 }
@@ -108,6 +128,35 @@ public String placeOrder(@ModelAttribute Order order, HttpSession session) {
 @GetMapping("/order-success")
 public String orderSuccess() {
     return "order-success";
+}
+
+@GetMapping("/payment/{id}")
+public String paymentPage(@PathVariable Long id, Model model) {
+
+    Order order = orderRepository.findById(id).orElse(null);
+
+    if (order == null) {
+        return "redirect:/";
+    }
+
+    model.addAttribute("order", order);
+
+    return "payment";
+}
+
+@PostMapping("/payment/{id}/pay")
+public String payOrder(@PathVariable Long id) {
+
+    Order order = orderRepository.findById(id).orElse(null);
+
+    if (order == null) {
+        return "redirect:/";
+    }
+
+    order.setPaymentStatus("Paid");
+    orderRepository.save(order);
+
+    return "redirect:/my-orders/" + id + "/invoice";
 }
 
 }

@@ -79,8 +79,13 @@
     <hr>
 
     <h5>Customer Information</h5>
+    
     <strong>Payment Method:</strong>
 <span th:text="${order.paymentMethod}"></span>
+<br>
+
+<strong>Payment Status:</strong>
+<span th:text="${order.paymentStatus}">Pending</span>
 <br>
 
     <p>
