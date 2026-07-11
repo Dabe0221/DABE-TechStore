@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-    @Query("SELECT i.productName, SUM(i.quantity) " +
-           "FROM OrderItem i " +
-           "GROUP BY i.productName " +
-           "ORDER BY SUM(i.quantity) DESC")
+    @Query(value = """
+            SELECT product_name, SUM(quantity) AS sold
+            FROM order_items
+            GROUP BY product_name
+            ORDER BY sold DESC
+            """, nativeQuery = true)
     List<Object[]> findTopSellingProducts();
 }

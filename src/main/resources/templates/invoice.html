@@ -84,6 +84,16 @@
 <span th:text="${order.paymentMethod}"></span>
 <br>
 
+<div th:if="${order.paymentStatus == 'Pending Payment'}"
+     class="mt-3 no-print">
+
+    <a th:href="@{/payment/{id}(id=${order.id})}"
+       class="btn btn-success">
+        Pay Now
+    </a>
+
+</div>
+
 <strong>Payment Status:</strong>
 
 <span

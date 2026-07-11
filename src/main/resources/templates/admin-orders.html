@@ -11,10 +11,96 @@
 
     <div class="d-flex justify-content-between mb-4">
         <h1>Admin - Orders</h1>
-        <a href="/admin/products" class="btn btn-secondary">Products</a>
+        <a th:href="@{/admin/products}" class="btn btn-secondary">
+                           Products
+        </a>
     </div>
 
-<table class="table table-bordered table-hover">
+
+
+       <div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <form th:action="@{/admin/orders}"
+              method="get"
+              class="row g-3">
+
+            <div class="col-lg-4">
+                <label class="form-label">Search</label>
+                <input type="text"
+                       name="keyword"
+                       class="form-control"
+                       placeholder="Customer name or email"
+                       th:value="${keyword}">
+            </div>
+
+            <div class="col-lg-3">
+                <label class="form-label">Order Status</label>
+                <select name="orderStatus" class="form-select">
+                    <option value="">All order statuses</option>
+                    <option value="Pending"
+                            th:selected="${selectedOrderStatus == 'Pending'}">
+                        Pending
+                    </option>
+                    <option value="Processing"
+                            th:selected="${selectedOrderStatus == 'Processing'}">
+                        Processing
+                    </option>
+                    <option value="Shipped"
+                            th:selected="${selectedOrderStatus == 'Shipped'}">
+                        Shipped
+                    </option>
+                    <option value="Delivered"
+                            th:selected="${selectedOrderStatus == 'Delivered'}">
+                        Delivered
+                    </option>
+                    <option value="Cancelled"
+                            th:selected="${selectedOrderStatus == 'Cancelled'}">
+                        Cancelled
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-3">
+                <label class="form-label">Payment Status</label>
+                <select name="paymentStatus" class="form-select">
+                    <option value="">All payment statuses</option>
+                    <option value="Paid"
+                            th:selected="${selectedPaymentStatus == 'Paid'}">
+                        Paid
+                    </option>
+                    <option value="Unpaid"
+                            th:selected="${selectedPaymentStatus == 'Unpaid'}">
+                        Unpaid
+                    </option>
+                    <option value="Pending Payment"
+                            th:selected="${selectedPaymentStatus == 'Pending Payment'}">
+                        Pending Payment
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 d-grid align-self-end">
+                <button type="submit" class="btn btn-primary">
+                    Apply Filters
+                </button>
+            </div>
+
+        </form>
+
+        <div class="mt-3">
+            <a th:href="@{/admin/orders}"
+               class="btn btn-sm btn-outline-secondary">
+                Clear Filters
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover mb-4">
     <thead class="table-dark">
     <tr>
         <th>Order #</th>
@@ -28,11 +114,18 @@
     </thead>
 
     <tbody>
+              <tr th:if="${#lists.isEmpty(orders)}">
+    <td colspan="7"
+        class="text-center text-muted py-4">
+        No orders found.
+    </td>
+</tr>
+        
     <tr th:each="order : ${orders}">
         <td th:text="${order.id}"></td>
         <td th:text="${order.customerName}"></td>
 
-        <td>
+        <td >
             ₱<span th:text="${order.totalAmount}"></span>
         </td>
 
@@ -82,40 +175,47 @@
             </span>
         </td>
 
-       <td>
-    <a th:href="@{/admin/order-details(id=${order.id})}"
-       class="btn btn-sm btn-dark">
-        View
-    </a>
+    <td>
+    <div class="d-flex flex-wrap gap-1 align-items-center">
 
-    <a th:href="@{/my-orders/{id}/invoice(id=${order.id})}"
-       class="btn btn-sm btn-secondary">
-        Invoice
-    </a>
+        <a th:href="@{/admin/order-details(id=${order.id})}"
+           class="btn btn-sm btn-dark">
+            View
+        </a>
 
-    <form th:action="@{/admin/orders/{id}/resend-email(id=${order.id})}"
-      method="post"
-      style="display:inline;">
-    <button class="btn btn-sm btn-warning">
-        Resend Email
-    </button>
-</form>
+        <a th:href="@{/my-orders/{id}/invoice(id=${order.id})}"
+           class="btn btn-sm btn-secondary">
+            Invoice
+        </a>
 
-<form th:if="${order.paymentStatus != 'Paid'}"
-      th:action="@{/admin/orders/{id}/mark-paid(id=${order.id})}"
-      method="post"
-      style="display:inline;">
-    <button class="btn btn-sm btn-success">
-        Mark Paid
-    </button>
-</form>
+        <form th:action="@{/admin/orders/{id}/resend-email(id=${order.id})}"
+              method="post">
+            <button type="submit" class="btn btn-sm btn-warning">
+                Resend Email
+            </button>
+        </form>
 
+        <form th:if="${order.paymentStatus != 'Paid'}"
+              th:action="@{/admin/orders/{id}/mark-paid(id=${order.id})}"
+              method="post">
+            <button type="submit" class="btn btn-sm btn-success">
+                Mark Paid
+            </button>
+        </form>
+
+    </div>
 </td>
     </tr>
     </tbody>
 </table>
 
-    <a href="/" class="btn btn-primary">Back to Store</a>
+</div>
+
+   <a th:href="@{/}" class="btn btn-primary">
+    Back to Store
+</a>
+
+
 
 </div>
 </body>

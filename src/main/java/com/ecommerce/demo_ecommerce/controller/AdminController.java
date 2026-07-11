@@ -40,9 +40,28 @@ public class AdminController {
     private final OrderItemRepository orderItemRepository;
     private final ReviewRepository reviewRepository;
     private final EmailService emailService;
-    @GetMapping("/admin/orders")
-public String adminOrders(Model model) {
-    model.addAttribute("orders", orderRepository.findAll());
+
+    
+@GetMapping("/admin/orders")
+public String adminOrders(
+        @RequestParam(name = "keyword", defaultValue = "") String keyword,
+        @RequestParam(name = "orderStatus", defaultValue = "") String orderStatus,
+        @RequestParam(name = "paymentStatus", defaultValue = "") String paymentStatus,
+        Model model) {
+
+    String cleanKeyword = keyword.trim();
+
+    var orders = orderRepository.filterOrders(
+            cleanKeyword,
+            orderStatus,
+            paymentStatus
+    );
+
+    model.addAttribute("orders", orders);
+    model.addAttribute("keyword", cleanKeyword);
+    model.addAttribute("selectedOrderStatus", orderStatus);
+    model.addAttribute("selectedPaymentStatus", paymentStatus);
+
     return "admin-orders";
 }
    public AdminController(ProductService productService,
@@ -74,18 +93,44 @@ public String showAddProductForm(Model model) {
 }
 
 @PostMapping("/admin/products/save")
-public String saveProduct(@ModelAttribute @NonNull Product product,
-                          @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+public String saveProduct(
+        @ModelAttribute @NonNull Product product,
+        @RequestParam("imageFile") MultipartFile imageFile
+) throws IOException {
 
-    if (!imageFile.isEmpty()) {
+    // Editing an existing product
+    if (product.getId() != null) {
+        Product existingProduct = productService.getProductById(product.getId());
 
-        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
-        String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+        if (existingProduct != null) {
+            // Keep the current image unless a new one is uploaded
+            product.setImageUrl(existingProduct.getImageUrl());
+        }
+    }
+
+    // Replace the existing image only when a new file is selected
+    if (imageFile != null && !imageFile.isEmpty()) {
+
+        String uploadDir =
+                System.getProperty("user.dir")
+                + "/src/main/resources/static/uploads/";
+
+        String originalFileName = imageFile.getOriginalFilename();
+
+        String safeFileName =
+                originalFileName == null
+                ? "product-image"
+                : originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+        String fileName =
+                System.currentTimeMillis() + "_" + safeFileName;
 
         File uploadFolder = new File(uploadDir);
 
-        if (!uploadFolder.exists()) {
-            uploadFolder.mkdirs();
+        if (!uploadFolder.exists() && !uploadFolder.mkdirs()) {
+            throw new IOException(
+                    "Could not create upload directory: " + uploadDir
+            );
         }
 
         File savedFile = new File(uploadFolder, fileName);
@@ -153,6 +198,34 @@ public String adminDashboard(Model model) {
                     .map(order -> order.getTotalAmount())
                     .reduce(java.math.BigDecimal.ZERO, (subtotal, amount) -> subtotal.add(amount)));
 
+
+                    model.addAttribute("processingOrders",
+        orders.stream()
+                .filter(order -> "Processing".equalsIgnoreCase(order.getStatus()))
+                .count());
+
+model.addAttribute("shippedOrders",
+        orders.stream()
+                .filter(order -> "Shipped".equalsIgnoreCase(order.getStatus()))
+                .count());
+
+model.addAttribute("cancelledOrders",
+        orders.stream()
+                .filter(order -> "Cancelled".equalsIgnoreCase(order.getStatus()))
+                .count());
+
+model.addAttribute("paidOrders",
+        orders.stream()
+                .filter(order -> "Paid".equalsIgnoreCase(order.getPaymentStatus()))
+                .count());
+
+model.addAttribute("unpaidOrders",
+        orders.stream()
+                .filter(order ->
+                        "Unpaid".equalsIgnoreCase(order.getPaymentStatus())
+                        || "Pending Payment".equalsIgnoreCase(order.getPaymentStatus()))
+                .count());
+
     model.addAttribute("pendingOrders",
             orders.stream()
                     .filter(order -> "Pending".equals(order.getStatus()))
@@ -186,12 +259,10 @@ public String adminDashboard(Model model) {
 
 model.addAttribute("ordersToday", ordersToday);
 
-java.time.LocalDate today = java.time.LocalDate.now();
-
 java.time.LocalDate chartEndDate = orders.stream()
         .filter(order -> order.getOrderDate() != null)
         .map(order -> order.getOrderDate().toLocalDate())
-        .max(java.time.LocalDate::compareTo)
+        .max(java.util.Comparator.naturalOrder())
         .orElse(java.time.LocalDate.now());
 
 java.util.List<String> revenueLabels = new java.util.ArrayList<>();
@@ -205,8 +276,8 @@ for (int i = 6; i >= 0; i--) {
             .filter(order -> order.getTotalAmount() != null)
             .filter(order -> !"Cancelled".equals(order.getStatus()))
             .filter(order -> order.getOrderDate().toLocalDate().equals(date))
-            .map(Order::getTotalAmount)
-            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+            .map(order -> order.getTotalAmount())
+            .reduce(java.math.BigDecimal.ZERO, (a, b) -> a.add(b));
 
     revenueLabels.add(date.getMonthValue() + "/" + date.getDayOfMonth());
     revenueData.add(dailyRevenue.doubleValue());
@@ -216,8 +287,9 @@ model.addAttribute("revenueLabels", revenueLabels);
 model.addAttribute("revenueData", revenueData);
 var topSellingProducts = orderItemRepository.findAll()
         .stream()
+        .filter(item -> item != null && item.getProductName() != null)
         .collect(Collectors.groupingBy(
-                OrderItem::getProductName,
+                item -> item.getProductName(),
                 Collectors.summingInt(OrderItem::getQuantity)
         ))
         .entrySet()
@@ -276,4 +348,6 @@ public String markOrderPaid(@PathVariable Long id) {
 
     return "redirect:/admin/orders";
 }
+
+       
 }

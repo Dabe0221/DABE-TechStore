@@ -141,7 +141,7 @@ public String myWishlist(Authentication authentication, Model model) {
     return "wishlist";
 }
  @GetMapping("/my-orders/{id}/invoice")
-public String myOrderInvoice(@PathVariable Long id,
+public String myOrderInvoice(@PathVariable @NonNull Long id,
                              Authentication authentication,
                              Model model) {
 

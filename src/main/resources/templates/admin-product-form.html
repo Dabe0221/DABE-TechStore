@@ -9,7 +9,10 @@
 <body>
 <div class="container my-5">
 
-    <h1>Add Product</h1>
+   <h1 th:text="${product.id == null ? 'Add Product' : 'Edit Product'}">
+    Add Product
+</h1>
+
 
     <form th:action="@{/admin/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
 
@@ -40,13 +43,29 @@
             <input type="text" th:field="*{category}" class="form-control">
         </div>
 
+        <div class="mb-3" th:if="${product.imageUrl != null}">
+    <label class="form-label">Current Image</label><br>
+    <img th:src="${product.imageUrl}"
+         alt="Current Product Image"
+         class="img-thumbnail"
+         style="max-width:200px;">
+</div>
+
         <div class="mb-3">
-    <label>Product Image</label>
+   <label class="form-label">
+    Upload New Image
+</label>
+
+<small class="text-muted d-block mb-2">
+    Leave empty to keep the current image.
+</small>
     <input type="file" name="imageFile" class="form-control">
 </div>
 
         <button class="btn btn-success">Save Product</button>
-        <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+       <a th:href="@{/admin/products}" class="btn btn-secondary">
+    Cancel
+</a>
 
     </form>
 

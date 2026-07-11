@@ -15,7 +15,7 @@ A modern Spring Boot e-commerce web application built with Java, Spring Boot, Th
 - Checkout
 - Order history
 - Order details
-- Order status timeline
+- Order status timelineS
 - Wishlist
 - Product reviews and ratings
 - Profile management

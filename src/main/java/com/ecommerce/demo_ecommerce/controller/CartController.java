@@ -1,6 +1,5 @@
 package com.ecommerce.demo_ecommerce.controller;
 
-import com.ecommerce.demo_ecommerce.cart.CartItem;
 import com.ecommerce.demo_ecommerce.cart.ShoppingCart;
 import com.ecommerce.demo_ecommerce.entity.Product;
 import com.ecommerce.demo_ecommerce.service.ProductService;

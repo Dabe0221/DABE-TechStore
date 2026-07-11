@@ -91,7 +91,18 @@ if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
     List<OrderItem> orderItems = new ArrayList<>();
 
     for (CartItem cartItem : cart.getItems()) {
-    Product product = productRepository.findById(cartItem.getProduct().getId())
+    
+    Long productId = null;
+    if (cartItem.getProduct() != null) {
+        productId = cartItem.getProduct().getId();
+    }
+
+    if (productId == null) {
+    
+        continue;
+    }
+
+    Product product = productRepository.findById(productId)
             .orElse(null);
 
     if (product == null) {

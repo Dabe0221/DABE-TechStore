@@ -101,17 +101,81 @@
         <canvas id="revenueChart" height="100"></canvas>
     </div>
 </div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card shadow-sm text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Processing</h6>
+                <h2 class="text-primary"
+                    th:text="${processingOrders}">
+                    0
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card shadow-sm text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Shipped</h6>
+                <h2 class="text-info"
+                    th:text="${shippedOrders}">
+                    0
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card shadow-sm text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Cancelled</h6>
+                <h2 class="text-danger"
+                    th:text="${cancelledOrders}">
+                    0
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm text-center h-100 border-success">
+            <div class="card-body">
+                <h6 class="text-muted">Paid Orders</h6>
+                <h2 class="text-success"
+                    th:text="${paidOrders}">
+                    0
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm text-center h-100 border-warning">
+            <div class="card-body">
+                <h6 class="text-muted">Unpaid / Pending</h6>
+                <h2 class="text-warning"
+                    th:text="${unpaidOrders}">
+                    0
+                </h2>
+            </div>
+        </div>
+    </div>
+
+</div>
    <!-- TABLES -->
 <div class="row g-4">
 
-    <div class="col-lg-4">
-        <div class="card shadow">
+    <div class="col-lg-6">
+        <div class="card shadow h-100">
             <div class="card-header bg-dark text-white">
                 ⚠ Low Stock Products
             </div>
 
             <div class="card-body">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover">  
                     <thead class="table-dark">
                     <tr>
                         <th>Product</th>
@@ -120,6 +184,13 @@
                     </thead>
 
                     <tbody>
+
+            <tr th:if="${#lists.isEmpty(topSellingProducts)}">
+                  <td colspan="2" class="text-center text-muted">
+                            No sales data available.
+                  </td>
+                 </tr>
+                        
                     <tr th:each="product : ${lowStockProducts}">
                         <td th:text="${product.name}"></td>
                         <td>
@@ -134,37 +205,52 @@
         </div>
     </div>
 
-    <div class="card shadow mt-4">
-    <div class="card-header bg-dark text-white">
-        ⭐ Highest Rated Products
-    </div>
+<div class="col-lg-6">
+    <div class="card shadow h-100">
+        <div class="card-header bg-dark text-white">
+            ⭐ Highest Rated Products
+        </div>
 
-    <div class="card-body">
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-            <tr>
-                <th>Product</th>
-                <th>Rating</th>
-                <th>Reviews</th>
-            </tr>
-            </thead>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Rating</th>
+                    <th>Reviews</th>
+                </tr>
+                </thead>
 
-            <tbody>
-            <tr th:each="item : ${highestRatedProducts}">
-                <td th:text="${item[0]}">Product</td>
-                <td>
-                    ⭐ <span th:text="${#numbers.formatDecimal(item[1], 1, 1)}">0.0</span>
-                </td>
-                <td>
-                    <span class="badge bg-primary" th:text="${item[2]}">0</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                <tbody>
+                <tr th:each="item : ${highestRatedProducts}">
+                    <td th:text="${item[0]}">Product</td>
+                    <td>
+                        ⭐
+                        <span th:text="${#numbers.formatDecimal(item[1], 1, 1)}">
+                            0.0
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary"
+                              th:text="${item[2]}">
+                            0
+                        </span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(highestRatedProducts)}">
+                    <td colspan="3"
+                        class="text-center text-muted">
+                        No ratings available.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header bg-dark text-white">
                 🏆 Top Selling Products
@@ -180,6 +266,13 @@
                     </thead>
 
                     <tbody>
+
+                        <tr th:if="${#lists.isEmpty(topSellingProducts)}">
+    <td colspan="2" class="text-center text-muted">
+        No sales data available.
+    </td>
+</tr>
+
                     <tr th:each="item : ${topSellingProducts}">
                         <td th:text="${item[0]}">Product</td>
                         <td>
@@ -195,8 +288,8 @@
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="card shadow">
+    <div class="col-lg-6">
+        <div class="card shadow h-100">
             <div class="card-header bg-dark text-white">
                 🧾 Recent Orders
             </div>
@@ -213,6 +306,13 @@
                     </thead>
 
                     <tbody>
+
+                        <tr th:if="${#lists.isEmpty(recentOrders)}">
+    <td colspan="4" class="text-center text-muted">
+        No recent orders.
+    </td>
+</tr>
+                         
                     <tr th:each="order : ${recentOrders}">
                         <td th:text="${order.id}"></td>
                         <td th:text="${order.customerName}"></td>
@@ -233,13 +333,17 @@
 
     <!-- BUTTONS -->
     <div class="mt-5">
-        <a href="/admin/products" class="btn btn-primary">
-            Manage Products
-        </a>
+      <a th:href="@{/}" class="btn btn-secondary">
+    Back to Store
+</a>
 
-        <a href="/admin/orders" class="btn btn-success">
-            Manage Orders
-        </a>
+<a th:href="@{/admin/products}" class="btn btn-primary">
+    Manage Products
+</a>
+
+<a th:href="@{/admin/orders}" class="btn btn-success">
+    Manage Orders
+</a>
     </div>
 
 </div>
