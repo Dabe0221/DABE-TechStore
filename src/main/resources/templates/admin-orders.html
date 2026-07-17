@@ -25,7 +25,9 @@
               method="get"
               class="row g-3">
 
-            <div class="col-lg-4">
+              <input type="hidden" name="page" value="0">
+
+           <div class="col-lg-3">
                 <label class="form-label">Search</label>
                 <input type="text"
                        name="keyword"
@@ -34,7 +36,7 @@
                        th:value="${keyword}">
             </div>
 
-            <div class="col-lg-3">
+           <div class="col-lg-2">
                 <label class="form-label">Order Status</label>
                 <select name="orderStatus" class="form-select">
                     <option value="">All order statuses</option>
@@ -61,7 +63,7 @@
                 </select>
             </div>
 
-            <div class="col-lg-3">
+            <div class="col-lg-2">
                 <label class="form-label">Payment Status</label>
                 <select name="paymentStatus" class="form-select">
                     <option value="">All payment statuses</option>
@@ -80,7 +82,33 @@
                 </select>
             </div>
 
-            <div class="col-lg-2 d-grid align-self-end">
+            <div class="col-lg-2">
+    <label class="form-label">Rows</label>
+
+    <select name="size" class="form-select">
+        <option value="5"
+                th:selected="${selectedSize == 5}">
+            5
+        </option>
+
+        <option value="10"
+                th:selected="${selectedSize == 10}">
+            10
+        </option>
+
+        <option value="20"
+                th:selected="${selectedSize == 20}">
+            20
+        </option>
+
+        <option value="50"
+                th:selected="${selectedSize == 50}">
+            50
+        </option>
+    </select>
+</div>
+
+            <div class="col-lg-3 d-grid align-self-end">
                 <button type="submit" class="btn btn-primary">
                     Apply Filters
                 </button>
@@ -211,11 +239,78 @@
 
 </div>
 
-   <a th:href="@{/}" class="btn btn-primary">
+<!-- PAGINATION START -->
+<div class="d-flex flex-column flex-md-row
+            justify-content-between align-items-md-center gap-3 mb-4"
+     th:if="${orderPage.totalPages > 0}">
+
+    <div class="text-muted">
+        Showing
+        <strong th:text="${orderPage.numberOfElements}">0</strong>
+        of
+        <strong th:text="${orderPage.totalElements}">0</strong>
+        orders
+    </div>
+
+    <nav aria-label="Admin order pagination">
+        <ul class="pagination mb-0">
+
+            <li class="page-item"
+                th:classappend="${orderPage.first} ? 'disabled'">
+
+                <a class="page-link"
+                   th:href="@{/admin/orders(
+                       keyword=${keyword},
+                       orderStatus=${selectedOrderStatus},
+                       paymentStatus=${selectedPaymentStatus},
+                       size=${selectedSize},
+                       page=${orderPage.number - 1}
+                   )}">
+                    Previous
+                </a>
+            </li>
+
+            <li class="page-item"
+                th:each="pageNumber : ${#numbers.sequence(0, orderPage.totalPages - 1)}"
+                th:classappend="${pageNumber == orderPage.number} ? 'active'">
+
+                <a class="page-link"
+                   th:text="${pageNumber + 1}"
+                   th:href="@{/admin/orders(
+                       keyword=${keyword},
+                       orderStatus=${selectedOrderStatus},
+                       paymentStatus=${selectedPaymentStatus},
+                       size=${selectedSize},
+                       page=${pageNumber}
+                   )}">
+                    1
+                </a>
+            </li>
+
+            <li class="page-item"
+                th:classappend="${orderPage.last} ? 'disabled'">
+
+                <a class="page-link"
+                   th:href="@{/admin/orders(
+                       keyword=${keyword},
+                       orderStatus=${selectedOrderStatus},
+                       paymentStatus=${selectedPaymentStatus},
+                       size=${selectedSize},
+                       page=${orderPage.number + 1}
+                   )}">
+                    Next
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+</div>
+<!-- PAGINATION END -->
+
+<a th:href="@{/}" class="btn btn-primary">
     Back to Store
 </a>
-
-
 
 </div>
 </body>

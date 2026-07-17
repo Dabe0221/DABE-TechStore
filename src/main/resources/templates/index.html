@@ -177,15 +177,18 @@
     </ul>
 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="/cart">
-                        <i class="bi bi-cart3"></i>
-                        Cart
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            0
-                        </span>
-                    </a>
-                </li>
+               <a th:href="@{/cart}"
+   class="position-relative text-white text-decoration-none d-inline-flex align-items-center gap-2">
+
+    <span style="font-size: 1.6rem;">🛒</span>
+    <span>Cart</span>
+
+    <span th:if="${cartCount > 0}"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          th:text="${cartCount}">
+        0
+    </span>
+</a>
 
             </ul>
         </div>

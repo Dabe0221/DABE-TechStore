@@ -82,4 +82,11 @@ public class ShoppingCart {
 
         return count;
     }
+
+public int getTotalQuantity() {
+    return items.stream()
+            .mapToInt(CartItem::getQuantity)
+            .sum();
+}
+
 }

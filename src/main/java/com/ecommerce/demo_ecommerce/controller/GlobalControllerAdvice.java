@@ -1,11 +1,13 @@
 package com.ecommerce.demo_ecommerce.controller;
 
+import com.ecommerce.demo_ecommerce.cart.ShoppingCart;
 import com.ecommerce.demo_ecommerce.entity.User;
 import com.ecommerce.demo_ecommerce.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.ui.Model;
 
 @ControllerAdvice
 public class GlobalControllerAdvice {
@@ -17,9 +19,15 @@ public class GlobalControllerAdvice {
     }
 
     @ModelAttribute
-    public void addLoggedInUser(Authentication authentication, Model model) {
+    public void addGlobalData(
+            Authentication authentication,
+            HttpSession session,
+            Model model) {
 
-        if (authentication != null && authentication.isAuthenticated()) {
+        // Logged-in user
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
 
             User user = userRepository
                     .findByEmail(authentication.getName())
@@ -29,5 +37,17 @@ public class GlobalControllerAdvice {
                 model.addAttribute("loggedUser", user);
             }
         }
+
+        // Cart quantity
+        ShoppingCart cart =
+                (ShoppingCart) session.getAttribute("cart");
+
+        int cartCount = 0;
+
+        if (cart != null) {
+            cartCount = cart.getTotalQuantity();
+        }
+
+        model.addAttribute("cartCount", cartCount);
     }
 }

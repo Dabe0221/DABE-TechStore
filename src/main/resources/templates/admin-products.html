@@ -4,77 +4,293 @@
     <meta charset="UTF-8">
     <title>Admin Products</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-light">
 
 <div class="container my-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Admin - Products</h1>
 
-        <a href="/" class="btn btn-secondary">
+        <a th:href="@{/}" class="btn btn-secondary">
             Back to Store
         </a>
     </div>
 
-    
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
 
-    <a href="/admin/add-product" class="btn btn-primary mb-3">
-    Add Product
-</a>
+            <form th:action="@{/admin/products}"
+                  method="get"
+                  class="row g-3">
 
-    <table class="table table-bordered table-hover align-middle">
+                <input type="hidden" name="page" value="0">
 
-        <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th width="180">Actions</th>
-        </tr>
-        </thead>
+                <div class="col-lg-3">
+                    <label class="form-label">Search</label>
 
-        <tbody>
-        <tr th:each="product : ${products}">
-            <td th:text="${product.id}">1</td>
+                    <input type="text"
+                           name="keyword"
+                           class="form-control"
+                           placeholder="Product name or description"
+                           th:value="${keyword}">
+                </div>
 
-            <td>
-               <img th:src="@{${product.imageUrl}}"
-     width="90"
-     height="90"
-     style="object-fit: cover; border-radius: 8px;">
-            </td>
+                <div class="col-lg-2">
+                    <label class="form-label">Category</label>
 
-            <td th:text="${product.name}">Product Name</td>
-            <td th:text="${product.category}">Category</td>
+                    <input type="text"
+                           name="category"
+                           class="form-control"
+                           placeholder="All categories"
+                           th:value="${selectedCategory}">
+                </div>
 
-            <td>
-                ₱<span th:text="${product.price}">0</span>
-            </td>
+                <div class="col-lg-2">
+                    <label class="form-label">Stock</label>
 
-            <td th:text="${product.stock}">0</td>
+                    <select name="stockFilter" class="form-select">
+                        <option value="">
+                            All stock levels
+                        </option>
 
-            <td>
-               <a th:href="@{/admin/products/edit/{id}(id=${product.id})}"
-   class="btn btn-warning btn-sm">
-    Edit
-</a>
+                        <option value="IN_STOCK"
+                                th:selected="${selectedStockFilter == 'IN_STOCK'}">
+                            In Stock
+                        </option>
 
-                <a th:href="@{/admin/products/delete/{id}(id=${product.id})}"
-   class="btn btn-danger btn-sm"
-   onclick="return confirm('Delete this product?')">
-    Delete
-</a>
-            </td>
-        </tr>
-        </tbody>
+                        <option value="LOW_STOCK"
+                                th:selected="${selectedStockFilter == 'LOW_STOCK'}">
+                            Low Stock
+                        </option>
 
-    </table>
+                        <option value="OUT_OF_STOCK"
+                                th:selected="${selectedStockFilter == 'OUT_OF_STOCK'}">
+                            Out of Stock
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <label class="form-label">Rows</label>
+
+                    <select name="size" class="form-select">
+                        <option value="5"
+                                th:selected="${selectedSize == 5}">
+                            5
+                        </option>
+
+                        <option value="10"
+                                th:selected="${selectedSize == 10}">
+                            10
+                        </option>
+
+                        <option value="20"
+                                th:selected="${selectedSize == 20}">
+                            20
+                        </option>
+
+                        <option value="50"
+                                th:selected="${selectedSize == 50}">
+                            50
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-lg-3 d-grid align-self-end">
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Apply Filters
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="mt-3">
+                <a th:href="@{/admin/products}"
+                   class="btn btn-sm btn-outline-secondary">
+                    Clear Filters
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <a th:href="@{/admin/add-product}"
+       class="btn btn-primary mb-3">
+        Add Product
+    </a>
+
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-hover align-middle mb-4">
+
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th style="width: 180px;">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:if="${#lists.isEmpty(products)}">
+                <td colspan="7"
+                    class="text-center text-muted py-4">
+                    No products match the selected filters.
+                </td>
+            </tr>
+
+            <tr th:each="product : ${products}">
+                <td th:text="${product.id}">1</td>
+
+                <td>
+                    <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                        th:src="@{${product.imageUrl}}"
+                         alt="Product Image"
+                         width="90"
+                         height="90"
+                         class="rounded"
+                         style="object-fit: cover;">
+
+                    <span th:if="${product.imageUrl == null or #strings.isEmpty(product.imageUrl)}"
+                          class="text-muted">
+                        No image
+                    </span>
+                </td>
+
+                <td th:text="${product.name}">
+                    Product Name
+                </td>
+
+                <td th:text="${product.category}">
+                    Category
+                </td>
+
+                <td>
+                    ₱<span th:text="${product.price}">0</span>
+                </td>
+
+                <td>
+                    <span th:if="${product.stock != null and product.stock > 5}"
+                          class="badge bg-success"
+                          th:text="${product.stock + ' - In Stock'}">
+                    </span>
+
+                    <span th:if="${product.stock != null and product.stock >= 1 and product.stock <= 5}"
+                          class="badge bg-warning text-dark"
+                          th:text="${product.stock + ' - Low Stock'}">
+                    </span>
+
+                    <span th:if="${product.stock != null and product.stock == 0}"
+                          class="badge bg-danger">
+                        0 - Out of Stock
+                    </span>
+
+                    <span th:if="${product.stock == null}"
+                          class="badge bg-secondary">
+                        Unknown
+                    </span>
+                </td>
+
+                <td>
+                    <div class="d-flex flex-wrap gap-1">
+
+                        <a th:href="@{/admin/products/edit/{id}(id=${product.id})}"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a th:href="@{/admin/products/delete/{id}(id=${product.id})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Delete this product?')">
+                            Delete
+                        </a>
+
+                    </div>
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-center gap-3 mb-4"
+         th:if="${productPage.totalPages > 0}">
+
+        <div class="text-muted">
+            Showing
+            <strong th:text="${productPage.numberOfElements}">0</strong>
+            of
+            <strong th:text="${productPage.totalElements}">0</strong>
+            products
+        </div>
+
+        <nav aria-label="Admin product pagination">
+            <ul class="pagination mb-0">
+
+                <li class="page-item"
+                    th:classappend="${productPage.first} ? 'disabled'">
+
+                    <a class="page-link"
+                       th:href="@{/admin/products(
+                           keyword=${keyword},
+                           category=${selectedCategory},
+                           stockFilter=${selectedStockFilter},
+                           size=${selectedSize},
+                           page=${productPage.number - 1}
+                       )}">
+                        Previous
+                    </a>
+                </li>
+
+                <li class="page-item"
+                    th:each="pageNumber : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                    th:classappend="${pageNumber == productPage.number} ? 'active'">
+
+                    <a class="page-link"
+                       th:text="${pageNumber + 1}"
+                       th:href="@{/admin/products(
+                           keyword=${keyword},
+                           category=${selectedCategory},
+                           stockFilter=${selectedStockFilter},
+                           size=${selectedSize},
+                           page=${pageNumber}
+                       )}">
+                        1
+                    </a>
+                </li>
+
+                <li class="page-item"
+                    th:classappend="${productPage.last} ? 'disabled'">
+
+                    <a class="page-link"
+                       th:href="@{/admin/products(
+                           keyword=${keyword},
+                           category=${selectedCategory},
+                           stockFilter=${selectedStockFilter},
+                           size=${selectedSize},
+                           page=${productPage.number + 1}
+                       )}">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </div>
 
 </div>
 

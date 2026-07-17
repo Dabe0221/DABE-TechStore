@@ -12,7 +12,9 @@
 
 <div class="container my-5">
 
-    <a href="/" class="btn btn-secondary mb-4">Back to Store</a>
+    <a th:href="@{/}" class="btn btn-secondary mb-4">
+    Back to Store
+</a>
 
     <h1 class="mb-4">Your Shopping Cart</h1>
 
@@ -74,9 +76,9 @@
 </h3>
 
 <div class="text-end mt-3">
-    <a href="/checkout" class="btn btn-success btn-lg">
-        Checkout
-    </a>
+   <a th:href="@{/checkout}" class="btn btn-success btn-lg">
+    Checkout
+</a>
 </div>
 
 </div>

@@ -3,6 +3,7 @@ package com.ecommerce.demo_ecommerce.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
@@ -63,4 +64,7 @@ public class OrderItem {
     public void setOrder(Order order) {
         this.order = order;
     }
+
+            
+
 }
