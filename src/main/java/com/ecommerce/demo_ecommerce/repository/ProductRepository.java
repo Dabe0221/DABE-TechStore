@@ -43,4 +43,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("stockFilter") String stockFilter,
             Pageable pageable
     );
+
+long countByStockLessThanEqualAndStockGreaterThan(
+        int maximumStock,
+        int minimumStock
+);
+
+long countByStock(int stock);
+
+@Query("SELECT COALESCE(SUM(p.stock), 0) FROM Product p")
+long sumTotalStock();
+
 }

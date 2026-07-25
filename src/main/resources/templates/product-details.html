@@ -2,253 +2,924 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
+
     <meta charset="UTF-8">
-    <title th:text="${product.name}">Product Details</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title th:text="${product.name + ' | DABE TechStore'}">
+        Product Details | DABE TechStore
+    </title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+    <!-- Your stylesheet -->
+    <link
+        rel="stylesheet"
+        th:href="@{/css/style.css}"
+    >
+
 </head>
 
-<body>
-<div class="container my-5">
+<body class="product-details-page">
 
-    <a href="/" class="btn btn-secondary mb-4">Back to Store</a>
+<!-- ================= NAVBAR ================= -->
 
-    <div class="row">
+<nav class="navbar navbar-expand-lg product-navbar">
 
-        <div class="col-md-6">
-            <img th:src="@{${product.imageUrl}}"
-                 class="img-fluid rounded shadow"
-                 style="max-height: 450px; object-fit: cover;">
-        </div>
+    <div class="container">
 
-        <div class="col-md-6">
+        <a
+            class="navbar-brand product-store-brand"
+            th:href="@{/}"
+        >
+            <span class="product-store-logo">
+                <i class="bi bi-cpu-fill"></i>
+            </span>
 
-            <h1 th:text="${product.name}">Product Name</h1>
+            <span>
+                DABE TechStore
+            </span>
+        </a>
 
-            <p>
-                <span class="badge bg-secondary"
-                      th:text="${product.category}">
-                    Category
-                </span>
-            </p>
-
-            <h2 class="text-primary">
-                ₱<span th:text="${product.price}">0</span>
-            </h2>
-
-            <p class="mt-3" th:text="${product.description}">
-                Product description
-            </p>
-
-            <p>
-                <strong>Stock:</strong>
-
-                <span th:if="${product.stock > 5}"
-                      class="badge bg-success"
-                      th:text="${product.stock + ' Available'}">
-                </span>
-
-                <span th:if="${product.stock > 0 && product.stock <= 5}"
-                      class="badge bg-warning text-dark"
-                      th:text="${product.stock + ' Left'}">
-                </span>
-
-                <span th:if="${product.stock <= 0}"
-                      class="badge bg-danger">
-                    Out of Stock
-                </span>
-            </p>
-
-          <form th:if="${product.stock > 0}"
-      th:action="@{/cart/add/{id}(id=${product.id})}"
-      method="post"
-      class="mt-3">
-
-    <div class="mb-3" style="max-width: 150px;">
-        <label>Quantity</label>
-        <div class="input-group" style="max-width: 160px;">
-    <button type="button" class="btn btn-outline-secondary" onclick="decreaseQty()">
-        -
-    </button>
-
-    <input type="text"
-           id="quantity"
-           name="quantity"
-           value="1"
-           class="form-control text-center"
-           readonly>
-
-    <button type="button"
-            class="btn btn-outline-secondary"
-            th:attr="data-stock=${product.stock}"
-            onclick="increaseQty(this)">
-        +
-    </button>
-</div>
-    </div>
-
-    <button class="btn btn-primary btn-lg">
-        Add to Cart
-    </button>
-</form>
-
-  <form th:action="@{/wishlist/add/{id}(id=${product.id})}"
-        method="post"
-        sec:authorize="isAuthenticated()"
-        class="mt-2">
-
-    <button class="btn btn-outline-danger">
-        <i class="bi bi-heart"></i>
-        Add to Wishlist
-    </button>
-</form>
-
-            <button th:if="${product.stock <= 0}"
-                    class="btn btn-secondary btn-lg mt-3"
-                    disabled>
-                Sold Out
-            </button>
-
-        </div>
+        <a
+            th:href="@{/}"
+            class="btn product-back-button"
+        >
+            <i class="bi bi-arrow-left me-2"></i>
+            Back to Store
+        </a>
 
     </div>
 
-    <hr class="my-5">
-
-    
-<div sec:authorize="isAuthenticated()">
-
-    <h3>Write a Review</h3>
-
-    <form th:action="@{/product/{id}/review(id=${product.id})}" method="post">
-
-        <div class="mb-3">
-            <label>Rating</label>
-            <select name="rating" class="form-select" required>
-                <option value="5">★★★★★ - Excellent</option>
-                <option value="4">★★★★☆ - Good</option>
-                <option value="3">★★★☆☆ - Average</option>
-                <option value="2">★★☆☆☆ - Poor</option>
-                <option value="1">★☆☆☆☆ - Bad</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Comment</label>
-            <textarea name="comment" class="form-control" required></textarea>
-        </div>
-
-        <button class="btn btn-success">
-            Submit Review
-        </button>
-
-    </form>
-
-</div>
-
-<div sec:authorize="!isAuthenticated()" class="alert alert-info">
-    Please <a href="/login">login</a> to write a review.
-</div>
-
-<hr class="my-5">
-
-<h3>Customer Reviews</h3>
-
-<p>
-    Average Rating:
-    <strong th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">0.0</strong>
-    / 5
-</p>
-
-<div th:if="${#lists.isEmpty(reviews)}" class="alert alert-info">
-    No reviews yet. Be the first to review this product.
-</div>
+</nav>
 
 
+<!-- ================= BREADCRUMB ================= -->
 
+<div class="container">
 
+    <nav
+        class="product-breadcrumb"
+        aria-label="breadcrumb"
+    >
+        <ol class="breadcrumb mb-0">
 
-<div th:each="review : ${reviews}" class="card mb-3">
-    <div class="card-body">
-
-        <h5>
-            <span th:text="${review.user.name}">User</span>
-        </h5>
-
-        <div class="text-warning">
-    <span th:each="i : ${#numbers.sequence(1, 5)}"
-          th:text="${i <= review.rating ? '★' : '☆'}">
-    </span>
-</div>
-
-        <p class="mt-2" th:text="${review.comment}">
-            Review comment
-        </p>
-
-    </div>
-</div>
-
-
-    <hr class="my-5">
-
-<h3 class="mb-4">You may also like</h3>
-
-<div class="row">
-
-    <div class="col-md-3 mb-4"
-         th:each="item : ${relatedProducts}">
-
-        <div class="card h-100 shadow-sm">
-
-            <img th:src="@{${item.imageUrl}}"
-                 class="card-img-top"
-                 style="height:200px;object-fit:cover;">
-
-            <div class="card-body">
-
-                <h5 th:text="${item.name}"></h5>
-
-                <p class="text-primary fw-bold">
-                    ₱<span th:text="${item.price}"></span>
-                </p>
-
-                <a th:href="@{/product/{id}(id=${item.id})}"
-                   class="btn btn-outline-primary w-100">
-                    View Product
+            <li class="breadcrumb-item">
+                <a th:href="@{/}">
+                    Home
                 </a>
+            </li>
+
+            <li class="breadcrumb-item">
+                Products
+            </li>
+
+            <li
+                class="breadcrumb-item active"
+                aria-current="page"
+                th:text="${product.name}"
+            >
+                Product
+            </li>
+
+        </ol>
+    </nav>
+
+</div>
+
+
+<!-- ================= PRODUCT DETAILS ================= -->
+
+<main class="container product-details-container">
+
+    <section class="product-details-card">
+
+        <div class="row g-0">
+
+            <!-- Product Image -->
+            <div class="col-lg-6">
+
+                <div class="product-details-image-section">
+
+                    <!-- Stock label -->
+                    <span
+                        class="product-details-stock-label in-stock"
+                        th:if="${product.stock != null and product.stock > 5}"
+                    >
+                        <i class="bi bi-check-circle-fill"></i>
+                        In Stock
+                    </span>
+
+                    <span
+                        class="product-details-stock-label low-stock"
+                        th:if="${product.stock != null and product.stock > 0 and product.stock <= 5}"
+                    >
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Low Stock
+                    </span>
+
+                    <span
+                        class="product-details-stock-label out-of-stock"
+                        th:if="${product.stock == null or product.stock <= 0}"
+                    >
+                        <i class="bi bi-x-circle-fill"></i>
+                        Out of Stock
+                    </span>
+
+                    <div class="product-details-image-wrapper">
+
+                        <img
+                            th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                            th:src="${product.imageUrl}"
+                            th:alt="${product.name}"
+                            class="product-details-main-image"
+                        >
+
+                        <div
+                            th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                            class="product-details-image-placeholder"
+                        >
+                            <i class="bi bi-image"></i>
+
+                            <span>
+                                No product image
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="product-image-feature-list">
+
+                        <div>
+                            <i class="bi bi-shield-check"></i>
+                            Secure purchase
+                        </div>
+
+                        <div>
+                            <i class="bi bi-box-seam"></i>
+                            Quality product
+                        </div>
+
+                        <div>
+                            <i class="bi bi-arrow-repeat"></i>
+                            Easy ordering
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Product Information -->
+            <div class="col-lg-6">
+
+                <div class="product-details-information">
+
+                    <span
+                        class="product-details-category"
+                        th:text="${product.category != null ? product.category : 'Technology'}"
+                    >
+                        Technology
+                    </span>
+
+                    <h1
+                        class="product-details-title"
+                        th:text="${product.name}"
+                    >
+                        Product Name
+                    </h1>
+
+
+                    <!-- Average rating -->
+                    <div class="product-details-rating-row">
+
+                        <div class="product-details-stars">
+
+                            <span
+                                th:each="number : ${#numbers.sequence(1, 5)}"
+                                th:text="${number <= averageRating ? '★' : '☆'}"
+                            >
+                                ★
+                            </span>
+
+                        </div>
+
+                        <span class="product-details-average">
+
+                            <strong
+                                th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"
+                            >
+                                0.0
+                            </strong>
+
+                            out of 5
+
+                        </span>
+
+                        <a
+                            href="#customer-reviews"
+                            class="product-review-link"
+                        >
+                            <span th:text="${#lists.size(reviews)}">0</span>
+                            reviews
+                        </a>
+
+                    </div>
+
+
+                    <!-- Price -->
+                    <div class="product-details-price">
+
+                        <span class="currency">
+                            ₱
+                        </span>
+
+                        <span
+                            th:text="${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}"
+                        >
+                            0.00
+                        </span>
+
+                    </div>
+
+
+                    <!-- Description -->
+                    <p
+                        class="product-details-description"
+                        th:text="${product.description}"
+                    >
+                        Product description appears here.
+                    </p>
+
+
+                    <!-- Availability -->
+                    <div class="product-availability-panel">
+
+                        <div class="product-availability-icon">
+
+                            <i
+                                class="bi bi-check-circle-fill"
+                                th:if="${product.stock != null and product.stock > 0}"
+                            ></i>
+
+                            <i
+                                class="bi bi-x-circle-fill text-danger"
+                                th:if="${product.stock == null or product.stock <= 0}"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong
+                                th:if="${product.stock != null and product.stock > 5}"
+                            >
+                                Available for ordering
+                            </strong>
+
+                            <strong
+                                th:if="${product.stock != null and product.stock > 0 and product.stock <= 5}"
+                                class="text-warning-emphasis"
+                            >
+                                Only a few items remaining
+                            </strong>
+
+                            <strong
+                                th:if="${product.stock == null or product.stock <= 0}"
+                                class="text-danger"
+                            >
+                                Currently unavailable
+                            </strong>
+
+                            <div
+                                class="product-availability-count"
+                                th:if="${product.stock != null and product.stock > 0}"
+                            >
+                                <span th:text="${product.stock}">0</span>
+                                units available
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Add to Cart -->
+                    <form
+                        th:if="${product.stock != null and product.stock > 0}"
+                        th:action="@{/cart/add/{id}(id=${product.id})}"
+                        method="post"
+                        class="product-purchase-form"
+                    >
+
+                        <label
+                            for="quantity"
+                            class="product-quantity-label"
+                        >
+                            Quantity
+                        </label>
+
+                        <div class="product-purchase-controls">
+
+                            <div class="product-quantity-selector">
+
+                                <button
+                                    type="button"
+                                    class="quantity-button"
+                                    onclick="decreaseQty()"
+                                    aria-label="Decrease quantity"
+                                >
+                                    <i class="bi bi-dash"></i>
+                                </button>
+
+                                <input
+                                    type="text"
+                                    id="quantity"
+                                    name="quantity"
+                                    value="1"
+                                    class="quantity-input"
+                                    readonly
+                                >
+
+                                <button
+                                    type="button"
+                                    class="quantity-button"
+                                    th:attr="data-stock=${product.stock}"
+                                    onclick="increaseQty(this)"
+                                    aria-label="Increase quantity"
+                                >
+                                    <i class="bi bi-plus"></i>
+                                </button>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="btn product-add-cart-button"
+                            >
+                                <i class="bi bi-cart-plus me-2"></i>
+                                Add to Cart
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+                    <!-- Wishlist -->
+                    <form th:action="@{/wishlist/add/{id}(id=${product.id})}"
+      method="post"
+      sec:authorize="isAuthenticated()"
+      class="product-wishlist-form">
+
+    <button type="submit"
+            class="btn product-details-wishlist-button">
+
+        <i class="bi bi-heart me-2"></i>
+        Add to Wishlist
+
+    </button>
+
+</form>
+
+
+                    <!-- Login required for wishlist -->
+                    <a
+                        th:href="@{/login}"
+                        sec:authorize="!isAuthenticated()"
+                        class="btn product-details-wishlist-button"
+                    >
+                        <i class="bi bi-heart me-2"></i>
+                        Login to Add to Wishlist
+                    </a>
+
+
+                    <!-- Sold out -->
+                    <button
+                        th:if="${product.stock == null or product.stock <= 0}"
+                        class="btn product-sold-out-button"
+                        disabled
+                    >
+                        <i class="bi bi-x-circle me-2"></i>
+                        Sold Out
+                    </button>
+
+
+                    <!-- Service information -->
+                    <div class="product-service-information">
+
+                        <div class="product-service-item">
+
+                            <i class="bi bi-shield-lock"></i>
+
+                            <div>
+                                <strong>
+                                    Secure Checkout
+                                </strong>
+
+                                <span>
+                                    Your account and order information are protected.
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="product-service-item">
+
+                            <i class="bi bi-truck"></i>
+
+                            <div>
+                                <strong>
+                                    Reliable Delivery
+                                </strong>
+
+                                <span>
+                                    Your order will be prepared and tracked carefully.
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
+    </section>
+
+
+    <!-- ================= REVIEWS ================= -->
+
+    <section
+        id="customer-reviews"
+        class="product-content-section"
+    >
+
+        <div class="product-section-heading">
+
+            <div>
+
+                <span class="product-section-label">
+                    Customer feedback
+                </span>
+
+                <h2>
+                    Ratings and Reviews
+                </h2>
+
+            </div>
+
+            <div class="product-rating-summary">
+
+                <strong
+                    th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"
+                >
+                    0.0
+                </strong>
+
+                <div>
+
+                    <div class="product-summary-stars">
+
+                        <span
+                            th:each="number : ${#numbers.sequence(1, 5)}"
+                            th:text="${number <= averageRating ? '★' : '☆'}"
+                        >
+                            ★
+                        </span>
+
+                    </div>
+
+                    <small>
+                        Based on
+                        <span th:text="${#lists.size(reviews)}">0</span>
+                        reviews
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            <!-- Review form -->
+            <div class="col-lg-5">
+
+                <div
+                    class="review-form-card"
+                    sec:authorize="isAuthenticated()"
+                >
+
+                    <div class="review-form-icon">
+                        <i class="bi bi-chat-square-heart"></i>
+                    </div>
+
+                    <h3>
+                        Write a Review
+                    </h3>
+
+                    <p>
+                        Share your experience with this product.
+                    </p>
+
+                    <form
+                        th:action="@{/product/{id}/review(id=${product.id})}"
+                        method="post"
+                    >
+
+                        <div class="mb-3">
+
+                            <label
+                                for="rating"
+                                class="form-label"
+                            >
+                                Rating
+                            </label>
+
+                            <select
+                                id="rating"
+                                name="rating"
+                                class="form-select product-form-control"
+                                required
+                            >
+                                <option value="5">
+                                    ★★★★★ — Excellent
+                                </option>
+
+                                <option value="4">
+                                    ★★★★☆ — Good
+                                </option>
+
+                                <option value="3">
+                                    ★★★☆☆ — Average
+                                </option>
+
+                                <option value="2">
+                                    ★★☆☆☆ — Poor
+                                </option>
+
+                                <option value="1">
+                                    ★☆☆☆☆ — Bad
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label
+                                for="comment"
+                                class="form-label"
+                            >
+                                Comment
+                            </label>
+
+                            <textarea
+                                id="comment"
+                                name="comment"
+                                class="form-control product-form-control"
+                                rows="5"
+                                placeholder="What did you like or dislike about this product?"
+                                required
+                            ></textarea>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn product-submit-review-button"
+                        >
+                            <i class="bi bi-send me-2"></i>
+                            Submit Review
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <div
+                    sec:authorize="!isAuthenticated()"
+                    class="review-login-card"
+                >
+
+                    <i class="bi bi-person-lock"></i>
+
+                    <h3>
+                        Login Required
+                    </h3>
+
+                    <p>
+                        Please log in to write a product review.
+                    </p>
+
+                    <a
+                        th:href="@{/login}"
+                        class="btn btn-primary"
+                    >
+                        Login to Review
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- Review list -->
+            <div class="col-lg-7">
+
+                <div
+                    th:if="${reviews == null or #lists.isEmpty(reviews)}"
+                    class="product-no-reviews"
+                >
+
+                    <i class="bi bi-chat-left-text"></i>
+
+                    <h3>
+                        No reviews yet
+                    </h3>
+
+                    <p>
+                        Be the first customer to review this product.
+                    </p>
+
+                </div>
+
+
+                <div
+                    th:each="review : ${reviews}"
+                    class="product-review-card"
+                >
+
+                    <div class="product-review-header">
+
+                        <div class="product-review-user">
+
+                            <div class="product-review-avatar">
+
+                                <span
+                                    th:text="${#strings.substring(review.user.name, 0, 1)}"
+                                >
+                                    U
+                                </span>
+
+                            </div>
+
+                            <div>
+
+                                <h4 th:text="${review.user.name}">
+                                    Customer
+                                </h4>
+
+                                <span>
+                                    Verified customer
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="product-review-stars">
+
+                            <span
+                                th:each="number : ${#numbers.sequence(1, 5)}"
+                                th:text="${number <= review.rating ? '★' : '☆'}"
+                            >
+                                ★
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <p
+                        class="product-review-comment"
+                        th:text="${review.comment}"
+                    >
+                        Review comment
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RELATED PRODUCTS ================= -->
+
+    <section
+        class="product-content-section related-products-section"
+        th:if="${relatedProducts != null and !#lists.isEmpty(relatedProducts)}"
+    >
+
+        <div class="product-section-heading">
+
+            <div>
+
+                <span class="product-section-label">
+                    More products
+                </span>
+
+                <h2>
+                    You May Also Like
+                </h2>
+
+            </div>
+
+            <a
+                th:href="@{/}"
+                class="product-view-all-link"
+            >
+                View all products
+                <i class="bi bi-arrow-right"></i>
+            </a>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            <div
+                class="col-xl-3 col-lg-4 col-md-6"
+                th:each="item : ${relatedProducts}"
+            >
+
+                <article class="related-product-card">
+
+                    <a
+                        th:href="@{/product/{id}(id=${item.id})}"
+                        class="related-product-image-link"
+                    >
+
+                        <img
+                            th:if="${item.imageUrl != null and !#strings.isEmpty(item.imageUrl)}"
+                            th:src="${item.imageUrl}"
+                            th:alt="${item.name}"
+                            class="related-product-image"
+                        >
+
+                        <div
+                            th:unless="${item.imageUrl != null and !#strings.isEmpty(item.imageUrl)}"
+                            class="related-product-placeholder"
+                        >
+                            <i class="bi bi-image"></i>
+                        </div>
+
+                    </a>
+
+                    <div class="related-product-body">
+
+                        <span
+                            class="related-product-category"
+                            th:text="${item.category != null ? item.category : 'Technology'}"
+                        >
+                            Technology
+                        </span>
+
+                        <a
+                            th:href="@{/product/{id}(id=${item.id})}"
+                            class="related-product-title-link"
+                        >
+
+                            <h3 th:text="${item.name}">
+                                Related Product
+                            </h3>
+
+                        </a>
+
+                        <div class="related-product-footer">
+
+                            <strong>
+                                ₱<span
+                                    th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}"
+                                >
+                                    0.00
+                                </span>
+                            </strong>
+
+                            <a
+                                th:href="@{/product/{id}(id=${item.id})}"
+                                class="related-product-view-button"
+                                aria-label="View product"
+                            >
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="product-details-footer">
+
+    <div class="container">
+
+        <div>
+
+            <strong>
+                DABE TechStore
+            </strong>
+
+            <span>
+                Quality technology for everyday life.
+            </span>
+
+        </div>
+
+        <a th:href="@{/}">
+            Continue Shopping
+        </a>
+
     </div>
 
-</div>
+</footer>
 
 
-</div>
+<!-- ================= JAVASCRIPT ================= -->
 
 <script>
-    function increaseQty(button) {
-        const stock = parseInt(button.getAttribute("data-stock"));
-        const quantityInput = document.getElementById("quantity");
 
-        let quantity = parseInt(quantityInput.value);
+    function increaseQty(button) {
+
+        const stock = Number.parseInt(
+            button.getAttribute("data-stock"),
+            10
+        );
+
+        const quantityInput =
+            document.getElementById("quantity");
+
+        let quantity =
+            Number.parseInt(quantityInput.value, 10);
+
+        if (Number.isNaN(quantity)) {
+            quantity = 1;
+        }
 
         if (quantity < stock) {
             quantityInput.value = quantity + 1;
         }
     }
 
-    function decreaseQty() {
-        const quantityInput = document.getElementById("quantity");
 
-        let quantity = parseInt(quantityInput.value);
+    function decreaseQty() {
+
+        const quantityInput =
+            document.getElementById("quantity");
+
+        let quantity =
+            Number.parseInt(quantityInput.value, 10);
+
+        if (Number.isNaN(quantity)) {
+            quantity = 1;
+        }
 
         if (quantity > 1) {
             quantityInput.value = quantity - 1;
         }
     }
+
 </script>
+
 </body>
 </html>

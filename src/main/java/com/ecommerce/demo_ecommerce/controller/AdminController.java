@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.ecommerce.demo_ecommerce.service.ProductService;
 import com.ecommerce.demo_ecommerce.repository.OrderItemRepository;
 import com.ecommerce.demo_ecommerce.service.EmailService;
+import com.ecommerce.demo_ecommerce.service.InventoryMovementService;
+import com.ecommerce.demo_ecommerce.service.NotificationService;
+import org.springframework.data.jpa.repository.Query;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Page;
@@ -27,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.ecommerce.demo_ecommerce.repository.OrderRepository;
 import com.ecommerce.demo_ecommerce.repository.UserRepository;
+import com.ecommerce.demo_ecommerce.entity.InventoryMovement;
 import com.ecommerce.demo_ecommerce.entity.Order;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -46,6 +50,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import com.ecommerce.demo_ecommerce.service.ActivityLogService;
+import com.ecommerce.demo_ecommerce.entity.InventoryMovement;
+import com.ecommerce.demo_ecommerce.service.InventoryMovementService;
+
 
 
 @Controller
@@ -60,6 +67,8 @@ public class AdminController {
     private final ProductRepository productRepository;
     private final SalesReportPdfService salesReportPdfService;
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
+    private final InventoryMovementService inventoryMovementService;
     
 @GetMapping("/admin/orders")
 public String adminOrders(
@@ -95,6 +104,7 @@ public String adminOrders(
     model.addAttribute("selectedOrderStatus", orderStatus);
     model.addAttribute("selectedPaymentStatus", paymentStatus);
     model.addAttribute("selectedSize", safeSize);
+    model.addAttribute("activePage", "orders");
 
     return "admin-orders";
 }
@@ -106,7 +116,9 @@ public String adminOrders(
                        ReviewRepository reviewRepository,
                        EmailService emailService,
                        SalesReportPdfService salesReportPdfService,
-                       ActivityLogService activityLogService) {
+                       ActivityLogService activityLogService,
+                       NotificationService notificationService,
+                       InventoryMovementService inventoryMovementService   ) {
 
     this.productService = productService;
     this.productRepository = productRepository;
@@ -117,11 +129,14 @@ public String adminOrders(
     this.emailService = emailService;
     this.salesReportPdfService = new SalesReportPdfService();
     this.activityLogService = activityLogService;
+    this.notificationService = notificationService;
+    this.inventoryMovementService = inventoryMovementService;
 }
 
     
 
-   @GetMapping("/admin/products")public String adminProducts(
+   @GetMapping("/admin/products")
+   public String adminProducts(
         @RequestParam(name = "keyword", defaultValue = "") String keyword,
         @RequestParam(name = "category", defaultValue = "") String category,
         @RequestParam(name = "stockFilter", defaultValue = "") String stockFilter,
@@ -162,6 +177,7 @@ response.setDateHeader("Expires", 0);
     model.addAttribute("selectedCategory", category);
     model.addAttribute("selectedStockFilter", stockFilter);
     model.addAttribute("selectedSize", safeSize);
+    model.addAttribute("activePage" , "products");
 
     return "admin-products";
 }
@@ -348,10 +364,7 @@ public String updateOrderStatus(
 public String adminDashboard(Model model) {
 
 
-        model.addAttribute(
-        "recentActivities",
-        activityLogService.getRecentActivities()
-);
+        
 
     var products = productService.getAllProducts();
     var orders = orderRepository.findAll();
@@ -536,6 +549,31 @@ public String adminDashboard(Model model) {
             orderStatusData
     );
 
+
+
+model.addAttribute(
+        "recentActivities",
+        activityLogService.getRecentActivities()
+);
+
+long totalInventoryProducts = productRepository.count();
+
+long lowStockCount = productRepository.countByStockLessThanEqualAndStockGreaterThan(
+        5,
+        0
+);
+
+long outOfStockCount = productRepository.countByStock(0);
+
+long totalAvailableStock = productRepository.sumTotalStock();
+
+model.addAttribute("totalInventoryProducts", totalInventoryProducts);
+model.addAttribute("lowStockCount", lowStockCount);
+model.addAttribute("outOfStockCount", outOfStockCount);
+model.addAttribute("totalAvailableStock", totalAvailableStock);
+model.addAttribute("activePage" , "dashboard");
+
+
     return "admin-dashboard";
 }
 
@@ -687,6 +725,7 @@ public String salesReport(
     model.addAttribute("productsSold", productsSold);
     model.addAttribute("averageOrder", averageOrder);
     model.addAttribute("reportOrders", reportOrders);
+    model.addAttribute("activePage", "reports");
 
     return "admin-sales-report";
 }
@@ -783,5 +822,256 @@ public ResponseEntity<byte[]> exportSalesReportPdf(
             .body(pdf);
 }
 
+  //New method to mark a notification as read
+
+@GetMapping("/admin/notifications/{id}/read")
+public String markNotificationAsRead(
+        @PathVariable Long id,
+        @RequestParam(required = false) String redirect
+) {
+
+    notificationService.markAsRead(id);
+
+    if (redirect == null || redirect.isBlank()) {
+        return "redirect:/admin/dashboard";
+    }
+
+     
+
+    return "redirect:" + redirect;
+}
        
+
+@PostMapping("/admin/notifications/mark-all-read")
+public String markAllNotificationsAsRead() {
+
+    notificationService.markAllAsRead();
+
+    
+
+    return "redirect:/admin/dashboard";
+}
+
+
+@GetMapping("/admin/inventory")
+public String inventoryHistory(
+        @RequestParam(name = "keyword", defaultValue = "")
+        String keyword,
+
+        @RequestParam(name = "movementType", defaultValue = "")
+        String movementType,
+
+        @RequestParam(name = "page", defaultValue = "0")
+        int page,
+
+        @RequestParam(name = "size", defaultValue = "10")
+        int size,
+
+        Model model) {
+
+    String cleanKeyword = keyword.trim();
+    String cleanMovementType = movementType.trim();
+
+    int safePage = Math.max(page, 0);
+    int safeSize = Math.max(1, Math.min(size, 100));
+
+    Pageable pageable = PageRequest.of(
+            safePage,
+            safeSize,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+    );
+
+    Page<InventoryMovement> movementPage =
+            inventoryMovementService.getInventoryMovements(
+                    cleanKeyword,
+                    cleanMovementType,
+                    pageable
+            );
+
+    model.addAttribute(
+            "movementPage",
+            movementPage
+    );
+
+    model.addAttribute(
+            "movements",
+            movementPage.getContent()
+    );
+
+    model.addAttribute(
+            "keyword",
+            cleanKeyword
+    );
+
+    model.addAttribute(
+            "movementType",
+            cleanMovementType
+    );
+
+    model.addAttribute("activePage", "inventory");
+
+    return "admin-inventory";
+}
+
+@GetMapping("/admin/products/{id}/adjust-stock")
+public String showAdjustStockForm(
+        @PathVariable Long id,
+        Model model,
+        RedirectAttributes redirectAttributes) {
+
+    Product product = productService.getProductById(id);
+
+    if (product == null) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "Product not found."
+        );
+
+        return "redirect:/admin/products";
+    }
+
+    model.addAttribute("product", product);
+
+    return "admin-adjust-stock";
+}
+
+@PostMapping("/admin/products/{id}/adjust-stock")
+public String adjustProductStock(
+        @PathVariable Long id,
+        @RequestParam String adjustmentType,
+        @RequestParam int quantity,
+        @RequestParam(required = false) String reason,
+        Authentication authentication,
+        RedirectAttributes redirectAttributes) {
+
+    Product product = productService.getProductById(id);
+
+    if (product == null) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "Product not found."
+        );
+
+        return "redirect:/admin/products";
+    }
+
+    if (quantity <= 0) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "Quantity must be greater than zero."
+        );
+
+        return "redirect:/admin/products/" + id + "/adjust-stock";
+    }
+
+    int stockBefore =
+            product.getStock() == null ? 0 : product.getStock();
+
+    int quantityChanged;
+    int stockAfter;
+    String movementType;
+
+    if ("ADD".equalsIgnoreCase(adjustmentType)) {
+
+        quantityChanged = quantity;
+        stockAfter = stockBefore + quantity;
+        movementType = "STOCK_IN";
+
+    } else if ("DEDUCT".equalsIgnoreCase(adjustmentType)) {
+
+        if (quantity > stockBefore) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "You cannot deduct more than the current stock."
+            );
+
+            return "redirect:/admin/products/" + id + "/adjust-stock";
+        }
+
+        quantityChanged = -quantity;
+        stockAfter = stockBefore - quantity;
+        movementType = "MANUAL_ADJUSTMENT";
+
+    } else {
+
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "Invalid adjustment type."
+        );
+
+        return "redirect:/admin/products/" + id + "/adjust-stock";
+    }
+
+    product.setStock(stockAfter);
+    productRepository.save(product);
+
+    String performedBy =
+            authentication != null
+                    ? authentication.getName()
+                    : "System";
+
+    String cleanReason =
+            reason == null || reason.isBlank()
+                    ? "Manual stock adjustment"
+                    : reason.trim();
+
+    inventoryMovementService.recordMovement(
+            product,
+            movementType,
+            quantityChanged,
+            stockBefore,
+            stockAfter,
+            null,
+            performedBy,
+            cleanReason
+    );
+
+    activityLogService.log(
+            "STOCK_ADJUSTED",
+            "Adjusted stock for "
+                    + product.getName()
+                    + " from "
+                    + stockBefore
+                    + " to "
+                    + stockAfter,
+            authentication
+    );
+
+    /*
+     * Notify when a manual deduction crosses
+     * the low-stock or out-of-stock threshold.
+     */
+    if (stockBefore > 0 && stockAfter == 0) {
+
+        notificationService.createNotification(
+                "OUT_OF_STOCK",
+                product.getName() + " is now out of stock.",
+                "/admin/products"
+        );
+
+    } else if (stockBefore > 5 && stockAfter <= 5) {
+
+        notificationService.createNotification(
+                "LOW_STOCK",
+                "Low stock warning: "
+                        + product.getName()
+                        + " has only "
+                        + stockAfter
+                        + " left.",
+                "/admin/products"
+        );
+    }
+
+    redirectAttributes.addFlashAttribute(
+            "successMessage",
+            "Stock updated successfully. "
+                    + stockBefore
+                    + " → "
+                    + stockAfter
+    );
+
+    return "redirect:/admin/inventory";
+}
+
+
 }

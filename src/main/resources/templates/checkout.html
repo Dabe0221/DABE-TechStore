@@ -1,68 +1,848 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Checkout</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Secure Checkout | DABE TechStore</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 
-<body>
-<div class="container my-5">
+<body class="checkout-page">
 
-    <h1>Checkout</h1>
+<!-- ================= CHECKOUT NAVBAR ================= -->
 
-    <div class="alert alert-info">
-        Total: ₱<span th:text="${cart.total}">0</span>
+<nav class="navbar navbar-dark checkout-navbar">
+
+    <div class="container">
+
+        <a th:href="@{/}"
+           class="navbar-brand d-flex align-items-center gap-2">
+
+            <span class="checkout-brand-icon">
+                <i class="bi bi-cpu-fill"></i>
+            </span>
+
+            <span>DABE TechStore</span>
+
+        </a>
+
+        <div class="checkout-navbar-security">
+
+            <i class="bi bi-shield-lock-fill"></i>
+
+            <span>Secure Checkout</span>
+
+        </div>
+
     </div>
 
-    <form th:action="@{/checkout/place-order}" th:object="${order}" method="post">
+</nav>
 
-        <div class="mb-3">
-            <label>Full Name</label>
-            <input type="text" th:field="*{customerName}" class="form-control" required>
+<!-- ================= MAIN CHECKOUT ================= -->
+
+<main class="container checkout-container">
+
+    <!-- Page Header -->
+
+    <div class="checkout-page-header">
+
+        <div>
+
+            <span class="checkout-page-label">
+                Complete your purchase
+            </span>
+
+            <h1 class="checkout-page-title">
+
+                <i class="bi bi-bag-check me-2"></i>
+                Secure Checkout
+
+            </h1>
+
+            <p class="checkout-page-description">
+                Enter your delivery details and choose your preferred payment
+                method to place your order.
+            </p>
+
         </div>
 
-        <div class="mb-3">
-    <label>Email</label>
-    <input type="email"
-           th:value="${#authentication.name}"
-           class="form-control"
-           readonly>
-</div>
+        <a th:href="@{/cart}"
+           class="btn checkout-back-button">
 
-        <div class="mb-3">
-            <label>Phone</label>
-            <input type="text" th:field="*{phone}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Address</label>
-            <textarea th:field="*{address}" class="form-control" required></textarea>
-        </div>
-
-        <div class="mb-3">
-    <label class="form-label">Payment Method</label>
-
-    <select name="paymentMethod" class="form-select" required>
-        <option value="">Select payment method</option>
-        <option value="Cash on Delivery">Cash on Delivery</option>
-        <option value="GCash">GCash</option>
-        <option value="PayPal">PayPal</option>
-        <option value="Credit/Debit Card">Credit/Debit Card</option>
-    </select>
-</div>
-
-
-        <button class="btn btn-success btn-lg">
-            Place Order
-        </button>
-
-        <a href="/cart" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left me-2"></i>
             Back to Cart
+
         </a>
+
+    </div>
+
+    <!-- Optional Error Message -->
+
+    <div th:if="${error}"
+         class="alert alert-danger checkout-alert">
+
+        <i class="bi bi-exclamation-circle-fill me-2"></i>
+
+        <span th:text="${error}">
+            Unable to place your order.
+        </span>
+
+    </div>
+
+    <!-- Optional Success or Information Message -->
+
+    <div th:if="${message}"
+         class="alert alert-info checkout-alert">
+
+        <i class="bi bi-info-circle-fill me-2"></i>
+
+        <span th:text="${message}">
+            Checkout information
+        </span>
+
+    </div>
+
+    <!-- ================= CHECKOUT FORM ================= -->
+
+    <form th:action="@{/checkout/place-order}"
+          th:object="${order}"
+          method="post"
+          class="checkout-form">
+
+        <div class="row g-4">
+
+            <!-- ================= CUSTOMER DETAILS ================= -->
+
+            <div class="col-lg-8">
+
+                <!-- Delivery Information -->
+
+                <section class="checkout-section-card">
+
+                    <div class="checkout-section-header">
+
+                        <div class="checkout-section-heading">
+
+                            <span class="checkout-section-icon">
+                                <i class="bi bi-truck"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="checkout-section-label">
+                                    Step 1
+                                </span>
+
+                                <h2>Delivery Information</h2>
+
+                                <p>
+                                    Provide the information needed to process
+                                    and deliver your order.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="checkout-section-body">
+
+                        <div class="row g-4">
+
+                            <!-- Full Name -->
+
+                            <div class="col-md-6">
+
+                                <label for="customerName"
+                                       class="checkout-form-label">
+
+                                    Full Name
+
+                                    <span class="checkout-required">*</span>
+
+                                </label>
+
+                                <div class="checkout-input-group">
+
+                                    <span class="checkout-input-icon">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+
+                                    <input type="text"
+                                           id="customerName"
+                                           th:field="*{customerName}"
+                                           class="form-control checkout-form-control"
+                                           placeholder="Enter your full name"
+                                           autocomplete="name"
+                                           required>
+
+                                </div>
+
+                                <div class="checkout-field-error"
+                                     th:if="${#fields.hasErrors('customerName')}">
+
+                                    <i class="bi bi-exclamation-circle"></i>
+
+                                    <span th:errors="*{customerName}">
+                                        Invalid customer name
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Email -->
+
+                            <div class="col-md-6">
+
+                                <label for="checkoutEmail"
+                                       class="checkout-form-label">
+
+                                    Email Address
+
+                                </label>
+
+                                <div class="checkout-input-group">
+
+                                    <span class="checkout-input-icon">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+
+                                    <input type="email"
+                                           id="checkoutEmail"
+                                           th:value="${#authentication.name}"
+                                           class="form-control checkout-form-control"
+                                           readonly>
+
+                                    <span class="checkout-verified-icon"
+                                          title="Authenticated account">
+
+                                        <i class="bi bi-patch-check-fill"></i>
+
+                                    </span>
+
+                                </div>
+
+                                <small class="checkout-field-help">
+                                    Your order confirmation will be connected
+                                    to this account.
+                                </small>
+
+                            </div>
+
+                            <!-- Phone -->
+
+                            <div class="col-md-6">
+
+                                <label for="phone"
+                                       class="checkout-form-label">
+
+                                    Phone Number
+
+                                    <span class="checkout-required">*</span>
+
+                                </label>
+
+                                <div class="checkout-input-group">
+
+                                    <span class="checkout-input-icon">
+                                        <i class="bi bi-telephone"></i>
+                                    </span>
+
+                                    <input type="tel"
+                                           id="phone"
+                                           th:field="*{phone}"
+                                           class="form-control checkout-form-control"
+                                           placeholder="Enter your phone number"
+                                           autocomplete="tel"
+                                           required>
+
+                                </div>
+
+                                <div class="checkout-field-error"
+                                     th:if="${#fields.hasErrors('phone')}">
+
+                                    <i class="bi bi-exclamation-circle"></i>
+
+                                    <span th:errors="*{phone}">
+                                        Invalid phone number
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Delivery Note -->
+
+                            <div class="col-md-6">
+
+                                <div class="checkout-delivery-note">
+
+                                    <i class="bi bi-info-circle"></i>
+
+                                    <div>
+
+                                        <strong>Delivery contact</strong>
+
+                                        <span>
+                                            Make sure your phone number is
+                                            active so you can be contacted
+                                            about your order.
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Address -->
+
+                            <div class="col-12">
+
+                                <label for="address"
+                                       class="checkout-form-label">
+
+                                    Complete Delivery Address
+
+                                    <span class="checkout-required">*</span>
+
+                                </label>
+
+                                <div class="checkout-textarea-group">
+
+                                    <span class="checkout-textarea-icon">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </span>
+
+                                    <textarea id="address"
+                                              th:field="*{address}"
+                                              class="form-control checkout-form-control checkout-address-field"
+                                              rows="4"
+                                              placeholder="House number, street, barangay, city or municipality, province and postal code"
+                                              autocomplete="street-address"
+                                              required></textarea>
+
+                                </div>
+
+                                <div class="checkout-field-error"
+                                     th:if="${#fields.hasErrors('address')}">
+
+                                    <i class="bi bi-exclamation-circle"></i>
+
+                                    <span th:errors="*{address}">
+                                        Invalid address
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- Payment Method -->
+
+                <section class="checkout-section-card checkout-payment-section">
+
+                    <div class="checkout-section-header">
+
+                        <div class="checkout-section-heading">
+
+                            <span class="checkout-section-icon payment">
+                                <i class="bi bi-credit-card"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="checkout-section-label">
+                                    Step 2
+                                </span>
+
+                                <h2>Payment Method</h2>
+
+                                <p>
+                                    Select how you would like to pay for your
+                                    order.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="checkout-section-body">
+
+                        <div class="checkout-payment-grid">
+
+                            <!-- Cash on Delivery -->
+
+                            <label class="checkout-payment-option">
+
+                                <input type="radio"
+                                       name="paymentMethod"
+                                       value="Cash on Delivery"
+                                       required>
+
+                                <span class="checkout-payment-card">
+
+                                    <span class="checkout-payment-select">
+                                        <i class="bi bi-check"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-icon cash">
+                                        <i class="bi bi-cash-stack"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-content">
+
+                                        <strong>Cash on Delivery</strong>
+
+                                        <small>
+                                            Pay when your order arrives.
+                                        </small>
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                            <!-- GCash -->
+
+                            <label class="checkout-payment-option">
+
+                                <input type="radio"
+                                       name="paymentMethod"
+                                       value="GCash">
+
+                                <span class="checkout-payment-card">
+
+                                    <span class="checkout-payment-select">
+                                        <i class="bi bi-check"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-icon mobile">
+                                        <i class="bi bi-phone"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-content">
+
+                                        <strong>GCash</strong>
+
+                                        <small>
+                                            Pay using your mobile wallet.
+                                        </small>
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                            <!-- PayPal -->
+
+                            <label class="checkout-payment-option">
+
+                                <input type="radio"
+                                       name="paymentMethod"
+                                       value="PayPal">
+
+                                <span class="checkout-payment-card">
+
+                                    <span class="checkout-payment-select">
+                                        <i class="bi bi-check"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-icon paypal">
+                                        <i class="bi bi-paypal"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-content">
+
+                                        <strong>PayPal</strong>
+
+                                        <small>
+                                            Pay through your PayPal account.
+                                        </small>
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                            <!-- Credit or Debit Card -->
+
+                            <label class="checkout-payment-option">
+
+                                <input type="radio"
+                                       name="paymentMethod"
+                                       value="Credit/Debit Card">
+
+                                <span class="checkout-payment-card">
+
+                                    <span class="checkout-payment-select">
+                                        <i class="bi bi-check"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-icon card">
+                                        <i class="bi bi-credit-card-2-front"></i>
+                                    </span>
+
+                                    <span class="checkout-payment-content">
+
+                                        <strong>Credit/Debit Card</strong>
+
+                                        <small>
+                                            Pay securely using your card.
+                                        </small>
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                        <div class="checkout-payment-notice">
+
+                            <i class="bi bi-info-circle-fill"></i>
+
+                            <p>
+                                Online payment options are displayed as
+                                available payment choices. Their actual payment
+                                processing flow can be connected later.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- Mobile Submit Area -->
+
+                <div class="checkout-mobile-actions d-lg-none">
+
+                    <button type="submit"
+                            class="btn btn-warning checkout-place-order-button">
+
+                        <i class="bi bi-bag-check-fill me-2"></i>
+                        Place Order
+
+                    </button>
+
+                    <a th:href="@{/cart}"
+                       class="btn checkout-return-cart-button">
+
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Return to Cart
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- ================= ORDER SUMMARY ================= -->
+
+            <div class="col-lg-4">
+
+                <aside class="checkout-summary-card">
+
+                    <div class="checkout-summary-header">
+
+                        <div>
+
+                            <span>Review your purchase</span>
+
+                            <h2>Order Summary</h2>
+
+                        </div>
+
+                        <i class="bi bi-receipt"></i>
+
+                    </div>
+
+                    <div class="checkout-summary-body">
+
+                        <!-- Optional Cart Products -->
+
+                        <div th:if="${cart != null
+                                    and cart.items != null
+                                    and !#lists.isEmpty(cart.items)}"
+                             class="checkout-summary-products">
+
+                            <article class="checkout-summary-product"
+                                     th:each="item : ${cart.items}">
+
+                                <div class="checkout-summary-product-image">
+
+                                    <img th:if="${item.product.imageUrl != null
+                                               and !#strings.isEmpty(item.product.imageUrl)}"
+                                         th:src="${item.product.imageUrl}"
+                                         th:alt="${item.product.name}">
+
+                                    <i th:unless="${item.product.imageUrl != null
+                                                  and !#strings.isEmpty(item.product.imageUrl)}"
+                                       class="bi bi-image">
+                                    </i>
+
+                                </div>
+
+                                <div class="checkout-summary-product-info">
+
+                                    <strong th:text="${item.product.name}">
+                                        Product Name
+                                    </strong>
+
+                                    <span>
+                                        Quantity:
+                                        <b th:text="${item.quantity}">1</b>
+                                    </span>
+
+                                </div>
+
+                                <div class="checkout-summary-product-price">
+
+                                    ₱<span th:text="${#numbers.formatDecimal(
+                                            item.subtotal,
+                                            1,
+                                            'COMMA',
+                                            2,
+                                            'POINT')}">
+                                        0.00
+                                    </span>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                        <div class="checkout-summary-divider"
+                             th:if="${cart != null
+                                     and cart.items != null
+                                     and !#lists.isEmpty(cart.items)}">
+                        </div>
+
+                        <div class="checkout-summary-row">
+
+                            <span>
+                                Products
+                            </span>
+
+                            <strong th:if="${cart != null
+                                           and cart.items != null}"
+                                    th:text="${#lists.size(cart.items)}">
+                                0
+                            </strong>
+
+                            <strong th:unless="${cart != null
+                                               and cart.items != null}">
+                                0
+                            </strong>
+
+                        </div>
+
+                        <div class="checkout-summary-row">
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <strong>
+                                ₱<span th:text="${#numbers.formatDecimal(
+                                        cart.total,
+                                        1,
+                                        'COMMA',
+                                        2,
+                                        'POINT')}">
+                                    0.00
+                                </span>
+                            </strong>
+
+                        </div>
+
+                        <div class="checkout-summary-row">
+
+                            <span>
+                                Shipping
+                            </span>
+
+                            <strong class="checkout-free-shipping">
+                                FREE
+                            </strong>
+
+                        </div>
+
+                        <div class="checkout-summary-row">
+
+                            <span>
+                                Discount
+                            </span>
+
+                            <strong>
+                                ₱0.00
+                            </strong>
+
+                        </div>
+
+                        <div class="checkout-summary-divider"></div>
+
+                        <div class="checkout-summary-total">
+
+                            <div>
+
+                                <span>Total Payment</span>
+
+                                <small>
+                                    Final amount for this order
+                                </small>
+
+                            </div>
+
+                            <strong>
+
+                                ₱<span th:text="${#numbers.formatDecimal(
+                                        cart.total,
+                                        1,
+                                        'COMMA',
+                                        2,
+                                        'POINT')}">
+                                    0.00
+                                </span>
+
+                            </strong>
+
+                        </div>
+
+                        <!-- Desktop Submit Button -->
+
+                        <button type="submit"
+                                class="btn btn-warning checkout-place-order-button d-none d-lg-block">
+
+                            <i class="bi bi-bag-check-fill me-2"></i>
+                            Place Order
+
+                        </button>
+
+                        <a th:href="@{/cart}"
+                           class="btn checkout-return-cart-button d-none d-lg-block">
+
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Return to Cart
+
+                        </a>
+
+                        <div class="checkout-security-box">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            <div>
+
+                                <strong>Secure order processing</strong>
+
+                                <span>
+                                    Your account and order information are
+                                    protected.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+                <!-- Checkout Benefits -->
+
+                <div class="checkout-benefits-card">
+
+                    <div class="checkout-benefit">
+
+                        <i class="bi bi-truck"></i>
+
+                        <div>
+
+                            <strong>Reliable Delivery</strong>
+
+                            <span>
+                                Orders are prepared carefully.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="checkout-benefit">
+
+                        <i class="bi bi-person-check"></i>
+
+                        <div>
+
+                            <strong>Verified Account</strong>
+
+                            <span>
+                                Your order is linked to your account.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="checkout-benefit">
+
+                        <i class="bi bi-headset"></i>
+
+                        <div>
+
+                            <strong>Customer Support</strong>
+
+                            <span>
+                                Assistance is available when needed.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </form>
 
-</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
 </body>
 </html>

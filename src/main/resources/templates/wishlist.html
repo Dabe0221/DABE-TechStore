@@ -1,68 +1,453 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>My Wishlist</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>My Wishlist | DABE TechStore</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 
-<body>
-<div class="container my-5">
+<body class="wishlist-page">
 
-    <a href="/" class="btn btn-secondary mb-4">Back to Store</a>
+<!-- ================= WISHLIST NAVBAR ================= -->
 
-    <h1 class="mb-4">❤️ My Wishlist</h1>
+<nav class="navbar navbar-dark wishlist-navbar">
 
-    <div th:if="${#lists.isEmpty(wishlistItems)}" class="alert alert-info">
-        Your wishlist is empty.
+    <div class="container">
+
+        <a th:href="@{/}"
+           class="navbar-brand d-flex align-items-center gap-2">
+
+            <span class="wishlist-brand-icon">
+                <i class="bi bi-cpu-fill"></i>
+            </span>
+
+            <span>DABE TechStore</span>
+
+        </a>
+
+        <a th:href="@{/}"
+           class="btn btn-outline-light">
+
+            <i class="bi bi-arrow-left me-2"></i>
+            Continue Shopping
+
+        </a>
+
     </div>
 
-    <div class="row" th:if="${!#lists.isEmpty(wishlistItems)}">
+</nav>
 
-        <div class="col-md-3 mb-4" th:each="item : ${wishlistItems}">
-            <div class="card h-100 shadow-sm">
+<!-- ================= MAIN CONTENT ================= -->
 
-                <img th:src="@{${item.product.imageUrl}}"
-                     class="card-img-top"
-                     style="height:200px;object-fit:cover;">
+<main class="container wishlist-container">
 
-                <div class="card-body">
-                    <h5 th:text="${item.product.name}">Product</h5>
+    <!-- Header -->
 
-                    <p class="text-primary fw-bold">
-                        ₱<span th:text="${item.product.price}">0</span>
-                    </p>
+    <div class="wishlist-page-header">
 
-                    <a th:href="@{/product/{id}(id=${item.product.id})}"
-                       class="btn btn-outline-primary w-100 mb-2">
-                        View Product
-                    </a>
+        <div>
 
-                    <a th:if="${item.product.stock > 0}"
-                       th:href="@{/cart/add/{id}(id=${item.product.id})}"
-                       class="btn btn-primary w-100 mb-2">
-                        Add to Cart
-                    </a>
+            <span class="wishlist-page-label">
+                Products saved for later
+            </span>
 
-                    <button th:if="${item.product.stock <= 0}"
-                            class="btn btn-secondary w-100 mb-2"
-                            disabled>
-                        Sold Out
-                    </button>
+            <h1 class="wishlist-page-title">
 
-                   <form th:action="@{/wishlist/remove/{id}(id=${item.product.id})}"
-                                  method="post">
-                             <button class="btn btn-outline-danger w-100">
-                                       Remove
-                                          </button>
-                                   </form>
-                </div>
+                <i class="bi bi-heart-fill me-2"></i>
+                My Wishlist
 
-            </div>
+            </h1>
+
+            <p class="wishlist-page-description">
+                Keep your favorite products here and purchase them whenever
+                you are ready.
+            </p>
+
+        </div>
+
+        <div class="wishlist-item-count"
+             th:if="${wishlistItems != null}">
+
+            <i class="bi bi-heart me-2"></i>
+
+            <span th:text="${#lists.size(wishlistItems)}">
+                0
+            </span>
+
+            <span th:text="${#lists.size(wishlistItems) == 1
+                    ? 'saved product'
+                    : 'saved products'}">
+                saved products
+            </span>
+
         </div>
 
     </div>
 
-</div>
+    <!-- ================= EMPTY WISHLIST ================= -->
+
+    <section th:if="${wishlistItems == null
+                    or #lists.isEmpty(wishlistItems)}"
+             class="empty-wishlist-section">
+
+        <div class="empty-wishlist-icon">
+            <i class="bi bi-heart"></i>
+        </div>
+
+        <h2>Your wishlist is empty</h2>
+
+        <p>
+            Save products you love and return to them anytime.
+            Start browsing the store to build your wishlist.
+        </p>
+
+        <a th:href="@{/}"
+           class="btn btn-warning btn-lg empty-wishlist-button">
+
+            <i class="bi bi-bag-plus me-2"></i>
+            Browse Products
+
+        </a>
+
+    </section>
+
+    <!-- ================= WISHLIST CONTENT ================= -->
+
+    <div th:if="${wishlistItems != null
+                and !#lists.isEmpty(wishlistItems)}"
+         class="row g-4">
+
+        <!-- Product Area -->
+
+        <div class="col-lg-9">
+
+            <section class="wishlist-products-section">
+
+                <div class="wishlist-section-header">
+
+                    <div>
+
+                        <h2>Saved Products</h2>
+
+                        <p>
+                            Review your favorite items, add them to your cart,
+                            or remove them from your wishlist.
+                        </p>
+
+                    </div>
+
+                    <i class="bi bi-heart-fill wishlist-section-icon"></i>
+
+                </div>
+
+                <div class="row g-4 wishlist-product-grid">
+
+                    <div class="col-xl-4 col-md-6"
+                         th:each="item : ${wishlistItems}">
+
+                        <article class="wishlist-product-card">
+
+                            <!-- Product Image -->
+
+                            <div class="wishlist-product-image-area">
+
+                                <span class="wishlist-stock-badge in-stock"
+                                      th:if="${item.product.stock != null
+                                              and item.product.stock > 0}">
+
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    In Stock
+
+                                </span>
+
+                                <span class="wishlist-stock-badge out-of-stock"
+                                      th:if="${item.product.stock == null
+                                              or item.product.stock <= 0}">
+
+                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                    Sold Out
+
+                                </span>
+
+                                <a th:href="@{/product/{id}(id=${item.product.id})}"
+                                   class="wishlist-product-image-link">
+
+                                    <img th:if="${item.product.imageUrl != null
+                                               and !#strings.isEmpty(item.product.imageUrl)}"
+                                         th:src="${item.product.imageUrl}"
+                                         th:alt="${item.product.name}"
+                                         class="wishlist-product-image">
+
+                                    <div th:unless="${item.product.imageUrl != null
+                                                   and !#strings.isEmpty(item.product.imageUrl)}"
+                                         class="wishlist-product-placeholder">
+
+                                        <i class="bi bi-image"></i>
+
+                                    </div>
+
+                                </a>
+
+                            </div>
+
+                            <!-- Product Information -->
+
+                            <div class="wishlist-product-body">
+
+                                <div class="wishlist-product-category">
+                                    Technology
+                                </div>
+
+                                <a th:href="@{/product/{id}(id=${item.product.id})}"
+                                   class="wishlist-product-name">
+
+                                    <h3 th:text="${item.product.name}">
+                                        Product Name
+                                    </h3>
+
+                                </a>
+
+                                <p class="wishlist-product-description"
+                                   th:if="${item.product.description != null}"
+                                   th:text="${item.product.description}">
+
+                                    Product description
+
+                                </p>
+
+                                <div class="wishlist-product-rating">
+
+                                    <div class="wishlist-rating-stars">
+
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star"></i>
+
+                                    </div>
+
+                                    <span>View reviews</span>
+
+                                </div>
+
+                                <div class="wishlist-product-price">
+
+                                    ₱<span th:text="${#numbers.formatDecimal(
+                                            item.product.price,
+                                            1,
+                                            'COMMA',
+                                            2,
+                                            'POINT')}">
+                                        0.00
+                                    </span>
+
+                                </div>
+
+                                <div class="wishlist-product-actions">
+
+                                    <a th:href="@{/product/{id}(id=${item.product.id})}"
+                                       class="btn wishlist-view-button">
+
+                                        <i class="bi bi-eye me-2"></i>
+                                        View Product
+
+                                    </a>
+
+                                    <form th:if="${item.product.stock != null
+                                                 and item.product.stock > 0}"
+                                          th:action="@{/cart/add/{id}(id=${item.product.id})}"
+                                          method="post"
+                                          class="wishlist-cart-form">
+
+                                        <input type="hidden"
+                                               name="quantity"
+                                               value="1">
+
+                                        <button type="submit"
+                                                class="btn wishlist-cart-button">
+
+                                            <i class="bi bi-cart-plus me-2"></i>
+                                            Add to Cart
+
+                                        </button>
+
+                                    </form>
+
+                                    <button th:if="${item.product.stock == null
+                                                   or item.product.stock <= 0}"
+                                            type="button"
+                                            class="btn wishlist-sold-out-button"
+                                            disabled>
+
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        Sold Out
+
+                                    </button>
+
+                                    <form th:action="@{/wishlist/remove/{id}(id=${item.product.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn wishlist-remove-button">
+
+                                            <i class="bi bi-trash3 me-2"></i>
+                                            Remove
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- ================= SUMMARY ================= -->
+
+        <div class="col-lg-3">
+
+            <aside class="wishlist-summary-card">
+
+                <div class="wishlist-summary-header">
+
+                    <div>
+
+                        <span>Saved collection</span>
+
+                        <h2>Wishlist Summary</h2>
+
+                    </div>
+
+                    <i class="bi bi-heart-fill"></i>
+
+                </div>
+
+                <div class="wishlist-summary-body">
+
+                    <div class="wishlist-summary-row">
+
+                        <span>Saved Products</span>
+
+                        <strong th:text="${#lists.size(wishlistItems)}">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="wishlist-summary-note">
+
+                        <i class="bi bi-info-circle"></i>
+
+                        <p>
+                            Product availability may change. Add available
+                            products to your cart before they sell out.
+                        </p>
+
+                    </div>
+
+                    <a th:href="@{/}"
+                       class="btn btn-warning wishlist-shop-button">
+
+                        <i class="bi bi-bag-plus me-2"></i>
+                        Continue Shopping
+
+                    </a>
+
+                    <a th:href="@{/cart}"
+                       class="btn wishlist-cart-link-button">
+
+                        <i class="bi bi-cart3 me-2"></i>
+                        View Shopping Cart
+
+                    </a>
+
+                </div>
+
+            </aside>
+
+            <div class="wishlist-benefits-card">
+
+                <div class="wishlist-benefit">
+
+                    <i class="bi bi-heart"></i>
+
+                    <div>
+
+                        <strong>Save Favorites</strong>
+
+                        <span>
+                            Keep products for later
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="wishlist-benefit">
+
+                    <i class="bi bi-cart-check"></i>
+
+                    <div>
+
+                        <strong>Quick Add to Cart</strong>
+
+                        <span>
+                            Buy available products easily
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="wishlist-benefit">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    <div>
+
+                        <strong>Secure Shopping</strong>
+
+                        <span>
+                            Protected customer account
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
 </body>
 </html>

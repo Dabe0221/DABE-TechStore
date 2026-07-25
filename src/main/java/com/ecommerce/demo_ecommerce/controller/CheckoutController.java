@@ -17,6 +17,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.ecommerce.demo_ecommerce.entity.Product;
 import com.ecommerce.demo_ecommerce.repository.ProductRepository;
 import com.ecommerce.demo_ecommerce.service.EmailService;
+import com.ecommerce.demo_ecommerce.service.NotificationService;
+import com.ecommerce.demo_ecommerce.service.InventoryMovementService;
+
 
 import java.util.List;
 import java.time.LocalDateTime;
@@ -27,13 +30,19 @@ public class CheckoutController {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final EmailService emailService;
+    private final NotificationService notificationService;
+    private final InventoryMovementService inventoryMovementService;
 
    public CheckoutController(OrderRepository orderRepository,
                           ProductRepository productRepository,
-                          EmailService emailService) {
+                          EmailService emailService,
+                          NotificationService notificationService,
+                          InventoryMovementService inventoryMovementService) {
     this.orderRepository = orderRepository;
     this.productRepository = productRepository;
     this.emailService = emailService;
+    this.notificationService = notificationService;
+    this.inventoryMovementService = inventoryMovementService;
 }
 
     private ShoppingCart getCart(HttpSession session) {
@@ -90,6 +99,15 @@ if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
 
     List<OrderItem> orderItems = new ArrayList<>();
 
+List<Product> purchasedProducts = new ArrayList<>();
+List<Integer> stockBeforeList = new ArrayList<>();
+List<Integer> stockAfterList = new ArrayList<>();
+List<Integer> quantityList = new ArrayList<>();
+
+
+
+
+
     for (CartItem cartItem : cart.getItems()) {
     
     Long productId = null;
@@ -121,15 +139,70 @@ if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
     item.setSubtotal(cartItem.getSubtotal());
     item.setOrder(order);
 
-    product.setStock(product.getStock() - cartItem.getQuantity());
-    productRepository.save(product);
+  int stockBefore = product.getStock();
+int stockAfter = stockBefore - cartItem.getQuantity();
+
+product.setStock(stockAfter);
+productRepository.save(product);
+
+
+purchasedProducts.add(product);
+stockBeforeList.add(stockBefore);
+stockAfterList.add(stockAfter);
+quantityList.add(cartItem.getQuantity());
+
+
+if (stockBefore > 0 && stockAfter == 0) {
+
+    notificationService.createNotification(
+            "OUT_OF_STOCK",
+            product.getName() + " is now out of stock.",
+            "/admin/products"
+    );
+
+// Notify only when stock first crosses from above 5 to 5 or below
+} else if (stockBefore > 5 && stockAfter <= 5) {
+
+    notificationService.createNotification(
+            "LOW_STOCK",
+            "Low stock warning: "
+                    + product.getName()
+                    + " has only "
+                    + stockAfter
+                    + " left.",
+            "/admin/products"
+    );
+}
 
     orderItems.add(item);
 }
     order.setItems(orderItems);
 
 
-    orderRepository.save(order);
+    Order savedOrder = orderRepository.save(order);
+
+
+    for (int i = 0; i < purchasedProducts.size(); i++) {
+
+    Product purchasedProduct = purchasedProducts.get(i);
+
+    inventoryMovementService.recordMovement(
+            purchasedProduct,
+            "SALE",
+            -quantityList.get(i),
+            stockBeforeList.get(i),
+            stockAfterList.get(i),
+            savedOrder.getId(),
+            order.getEmail(),
+            "Sold through customer checkout"
+    );
+}
+
+notificationService.createNotification(
+        "NEW_ORDER",
+        "New order received: Order #" + savedOrder.getId(),
+        "/admin/orders"
+);
 
     
 if ("Cash on Delivery".equalsIgnoreCase(order.getPaymentMethod())) {

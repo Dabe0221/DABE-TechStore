@@ -14,7 +14,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" th:href="@{/css/style.css}">
 
 </head>
 
@@ -22,13 +22,24 @@
 
 <!-- ================= NAVBAR ================= -->
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-    <div class="container">
+<nav class="navbar navbar-expand-lg navbar-dark store-navbar sticky-top">
+    <div class="container-fluid px-lg-5">
 
-        <a class="navbar-brand fw-bold" href="/">
-            <i class="bi bi-bag-fill"></i>
-            DABE TechStore
-        </a>
+
+       <a
+    class="navbar-brand fw-bold d-flex align-items-center gap-2"
+    th:href="@{/}"
+>
+    <span
+        class="d-inline-flex align-items-center justify-content-center
+               bg-warning text-dark rounded-3"
+        style="width: 40px; height: 40px;"
+    >
+        <i class="bi bi-cpu-fill"></i>
+    </span>
+
+    <span>DABE TechStore</span>
+</a>
 
         <button class="navbar-toggler"
                 type="button"
@@ -39,320 +50,432 @@
 
         <div class="collapse navbar-collapse" id="nav">
 
-            <form class="d-flex mx-auto w-50" method="get" action="/">
-                <input class="form-control"
-                       name="keyword"
-                       th:value="${keyword}"
-                       placeholder="Search products...">
+            <form
+    class="input-group store-search mx-lg-auto"
+    method="get"
+    th:action="@{/}"
+>
 
-                <button class="btn btn-warning ms-2" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
+    <input
+        class="form-control"
+        type="search"
+        name="keyword"
+        th:value="${keyword}"
+        placeholder="Search laptops, accessories, electronics..."
+        aria-label="Search products"
+    >
 
-            <ul class="navbar-nav">
+    <button
+        class="btn btn-warning"
+        type="submit"
+        aria-label="Submit search"
+    >
+        <i class="bi bi-search"></i>
+    </button>
 
-                <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="nav-link" href="/login">
-                        <i class="bi bi-person"></i>
-                        Login
-                    </a>
-                </li>
+</form>
 
-                <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="nav-link" href="/register">
-                        Register
-                    </a>
-                </li>
+           <ul class="navbar-nav">
 
-                <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       role="button"
-                       data-bs-toggle="dropdown">
-                        <i class="bi bi-shield-lock-fill"></i>
-                        Admin
-                    </a>
+    <!-- LOGIN -->
+    <li class="nav-item" sec:authorize="!isAuthenticated()">
+        <a class="nav-link" href="/login">
+            <i class="bi bi-person"></i>
+            Login
+        </a>
+    </li>
 
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        
-                        <li>
-                           <a class="dropdown-item" href="/admin/dashboard">
-                               <i class="bi bi-speedometer2"></i>
-                                      Dashboard
-                               </a>
-                               </li>
-                        
-                        <li>
-                            <a class="dropdown-item" href="/admin/products">
-                                <i class="bi bi-box-seam"></i>
-                                Products
-                            </a>
-                        </li>
+    <!-- REGISTER -->
+    <li class="nav-item" sec:authorize="!isAuthenticated()">
+        <a class="nav-link" href="/register">
+            Register
+        </a>
+    </li>
 
-                        <li>
-                            <a class="dropdown-item" href="/admin/orders">
-                                <i class="bi bi-receipt"></i>
-                                Orders
-                            </a>
-                        </li>
+    <!-- ADMIN MENU -->
+    <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
 
-                        <li><hr class="dropdown-divider"></li>
+        <a class="nav-link dropdown-toggle"
+           href="#"
+           role="button"
+           data-bs-toggle="dropdown">
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bi bi-graph-up"></i>
-                                Analytics
-                                <span class="badge bg-secondary ms-2">Soon</span>
-                            </a>
-                        </li>
+            <i class="bi bi-shield-lock-fill"></i>
+            Admin
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bi bi-people"></i>
-                                Users
-                                <span class="badge bg-secondary ms-2">Soon</span>
-                            </a>
+        </a>
 
-                            
-                        </li>
-                    </ul>
-                </li>
+        <ul class="dropdown-menu dropdown-menu-end">
 
-              <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-    <a class="nav-link dropdown-toggle"
-       href="#"
-       role="button"
-       data-bs-toggle="dropdown"
-       aria-expanded="false">
-        <i class="bi bi-person-circle me-1"></i>
-        <span th:text="${loggedUser.name}">Account</span>
-    </a>
+            <li>
+                <a class="dropdown-item" href="/admin/dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+            </li>
 
-    <ul class="dropdown-menu dropdown-menu-end">
-        <li>
-            <div class="dropdown-item-text text-center">
-                <i class="bi bi-person-circle fs-1"></i>
+            <li>
+                <a class="dropdown-item" href="/admin/products">
+                    <i class="bi bi-box-seam"></i>
+                    Products
+                </a>
+            </li>
 
-                <div class="fw-bold mt-2"
-                     th:text="${loggedUser.name}">
-                    User
+            <li>
+                <a class="dropdown-item" href="/admin/orders">
+                    <i class="bi bi-receipt"></i>
+                    Orders
+                </a>
+            </li>
+
+            <li><hr class="dropdown-divider"></li>
+
+            <li>
+                <a class="dropdown-item" href="#">
+                    <i class="bi bi-graph-up"></i>
+                    Analytics
+                    <span class="badge bg-secondary ms-2">Soon</span>
+                </a>
+            </li>
+
+            <li>
+                <a class="dropdown-item" href="#">
+                    <i class="bi bi-people"></i>
+                    Users
+                    <span class="badge bg-secondary ms-2">Soon</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </li>
+
+    <!-- NOTIFICATIONS -->
+    <li class="nav-item dropdown ms-2"
+        sec:authorize="hasRole('ADMIN')">
+
+        <button
+                class="btn btn-outline-light position-relative"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+
+            <i class="bi bi-bell-fill"></i>
+
+            <span
+                    th:if="${unreadNotificationCount > 0}"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    th:text="${unreadNotificationCount}">
+                0
+            </span>
+
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end shadow p-0"
+             style="width:360px;max-height:450px;overflow-y:auto;">
+
+            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+
+                <h6 class="mb-0">
+                    Notifications
+                </h6>
+
+                <form
+                        th:if="${unreadNotificationCount > 0}"
+                        th:action="@{/admin/notifications/mark-all-read}"
+                        method="post">
+
+                    <button
+                            class="btn btn-sm btn-link text-decoration-none p-0"
+                            type="submit">
+
+                        Mark all as read
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div
+                    th:if="${#lists.isEmpty(recentNotifications)}"
+                    class="text-center text-muted py-4">
+
+                No notifications yet.
+
+            </div>
+
+            <div
+                    th:each="notification : ${recentNotifications}"
+                    class="border-bottom">
+
+                <a
+                        th:href="@{/admin/notifications/{id}/read(
+                        id=${notification.id},
+                        redirect=${notification.link}
+                    )}"
+
+                        class="dropdown-item py-3"
+
+                        th:classappend="${!notification.readStatus}
+                        ? ' bg-light fw-semibold'
+                        : ''">
+
+                    <div class="d-flex">
+
+                        <div class="me-3 fs-5">
+
+                            <i
+                                    th:if="${notification.type=='NEW_ORDER'}"
+                                    class="bi bi-cart-check text-success">
+                            </i>
+
+                            <i
+                                    th:if="${notification.type=='LOW_STOCK'}"
+                                    class="bi bi-exclamation-triangle text-warning">
+                            </i>
+
+                            <i
+                                    th:if="${notification.type=='NEW_REVIEW'}"
+                                    class="bi bi-star-fill text-primary">
+                            </i>
+
+                            <i
+                                    th:if="${notification.type=='TEST'}"
+                                    class="bi bi-bell text-secondary">
+                            </i>
+
+                        </div>
+
+                        <div class="flex-grow-1">
+
+                            <div
+                                    class="text-wrap"
+                                    th:text="${notification.message}">
+                            </div>
+
+                            <small
+                                    class="text-muted"
+                                    th:text="${#temporals.format(notification.createdAt,'MMM dd, yyyy hh:mm a')}">
+                            </small>
+
+                        </div>
+
+                        <span
+                                th:if="${!notification.readStatus}"
+                                class="badge bg-primary align-self-start ms-2">
+
+                            New
+
+                        </span>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </li>
+
+    <!-- ACCOUNT -->
+    <li class="nav-item dropdown ms-2"
+        sec:authorize="isAuthenticated()">
+
+        <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown">
+
+            <i class="bi bi-person-circle me-1"></i>
+
+            <span th:text="${loggedUser.name}">
+                Account
+            </span>
+
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+
+            <li>
+
+                <div class="dropdown-item-text text-center">
+
+                    <i class="bi bi-person-circle fs-1"></i>
+
+                    <div
+                            class="fw-bold mt-2"
+                            th:text="${loggedUser.name}">
+                    </div>
+
+                    <small
+                            class="text-muted"
+                            th:text="${loggedUser.email}">
+                    </small>
+
                 </div>
 
-                <small class="text-muted"
-                       th:text="${loggedUser.email}">
-                    email@example.com
-                </small>
-            </div>
-        </li>
+            </li>
 
-        <li><hr class="dropdown-divider"></li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
 
-        <li>
-            <a href="/my-profile" class="dropdown-item">
-    My Profile
-</a>
+            <li>
+                <a href="/my-profile"
+                   class="dropdown-item">
+                    My Profile
+                </a>
+            </li>
 
-<!-- Customer Only -->
-<li sec:authorize="!hasRole('ADMIN')">
-    <a class="dropdown-item" href="/my-orders">
-        My Orders
+            <li sec:authorize="!hasRole('ADMIN')">
+                <a class="dropdown-item"
+                   href="/my-orders">
+                    My Orders
+                </a>
+            </li>
+
+            <li sec:authorize="!hasRole('ADMIN')">
+                <a class="dropdown-item"
+                   href="/wishlist">
+                    My Wishlist
+                </a>
+            </li>
+
+            <li>
+
+                <form
+                        th:action="@{/logout}"
+                        method="post">
+
+                    <button
+                            class="dropdown-item text-danger"
+                            type="submit">
+
+                        Logout
+
+                    </button>
+
+                </form>
+
+            </li>
+
+        </ul>
+
+    </li>
+
+    
+    <!-- CART -->
+<li
+    class="nav-item ms-lg-2"
+    sec:authorize="isAuthenticated()"
+>
+
+    <a
+        th:href="@{/cart}"
+        class="nav-link nav-icon-button"
+    >
+        <i class="bi bi-cart3 fs-5"></i>
+
+        <span>Cart</span>
+
+        <span
+            th:if="${cartCount != null and cartCount > 0}"
+            class="cart-badge badge rounded-pill bg-danger"
+            th:text="${cartCount}"
+        >
+            0
+        </span>
     </a>
+
 </li>
 
- <li sec:authorize="!hasRole('ADMIN')">
-    <a class="dropdown-item" href="/wishlist">
-         My Wishlist
-    </a>
-</li>
-
-<!-- Admin Only -->
-
-
-<form th:action="@{/logout}" method="post">
-    <button class="dropdown-item text-danger">
-        Logout
-    </button>
-</form>
-    </ul>
-</li>
-
-               <a th:href="@{/cart}"
-   class="position-relative text-white text-decoration-none d-inline-flex align-items-center gap-2">
-
-    <span style="font-size: 1.6rem;">🛒</span>
-    <span>Cart</span>
-
-    <span th:if="${cartCount > 0}"
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          th:text="${cartCount}">
-        0
-    </span>
-</a>
-
-            </ul>
+</ul>
         </div>
     </div>
 </nav>
 
-<!-- HERO -->
+<!-- ================= HERO ================= -->
 
-<section class="hero">
+<section class="store-hero">
 
-<div class="container">
+    <div class="container">
 
-<div class="row align-items-center">
+        <div class="row align-items-center g-5">
 
-<div class="col-lg-6">
+            <!-- Hero Text -->
+            <div class="col-lg-6">
 
-<h1>Upgrade Your Tech Today</h1>
+                <div class="hero-content">
 
-<p>
+                    <div class="hero-badge">
+                        <i class="bi bi-lightning-charge-fill text-warning"></i>
+                        New technology. Better prices.
+                    </div>
 
-Discover premium electronics at unbeatable prices.
+                    <h1 class="hero-title">
+                        Upgrade Your Technology.
+                        Elevate Your Everyday Life.
+                    </h1>
 
-</p>
-
-<button class="btn btn-warning btn-lg">
-
-Shop Now
-
-</button>
-
-</div>
-
-<div class="col-lg-6 text-center">
-
-<img
-src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=900"
-class="img-fluid rounded shadow">
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-<!-- FEATURED -->
-
-<div class="container my-5">
-
-    <h2 class="mb-4">Featured Products</h2>
-
-    <div class="row">
-
-        <div th:if="${error}" class="alert alert-danger">
-    <span th:text="${error}"></span>
-</div>
-
-        <div class="col-lg-3 col-md-6 mb-4" th:each="product : ${products}">
-
-            <div class="card product-card h-100">
-                      <img th:src="@{${product.imageUrl}}"
-                           class="card-img-top"
-                             alt="Product Image">
-
-                <div class="card-body">
-
-                    <h5 th:text="${product.name}">Product Name</h5>
-
-                   <div class="d-flex align-items-center mb-2">
-
-                    <div th:if="${ratingMap[product.id] >= 4.5 && reviewCountMap[product.id] >= 5}">
-    <span class="badge bg-success mb-2">
-        ⭐ Top Rated
-    </span>
-</div>
-
-    <div class="text-warning me-2">
-        <span th:each="i : ${#numbers.sequence(1,5)}"
-              th:text="${i <= T(java.lang.Math).round(ratingMap[product.id]) ? '★' : '☆'}">
-        </span>
-    </div>
-
-    <small class="text-muted"
-           th:if="${reviewCountMap[product.id] > 0}">
-
-        <strong
-            th:text="${#numbers.formatDecimal(ratingMap[product.id],1,1)}">
-        </strong>
-
-        (<span th:text="${reviewCountMap[product.id]}"></span>)
-
-    </small>
-
-    <small class="text-muted"
-           th:if="${reviewCountMap[product.id] == 0}">
-
-        No reviews
-
-    </small>
-
-</div>
-
-                    <h4>
-                        ₱<span th:text="${product.price}">0</span>
-                    </h4>
-
-                    <p th:text="${product.description}">
-                        Product description
+                    <p class="hero-description">
+                        Discover quality laptops, computer accessories,
+                        chargers, keyboards, and other technology essentials
+                        at prices made for you.
                     </p>
 
-                  <p>
-    <strong>Stock:</strong>
+                    <div class="hero-actions">
 
-    <span th:if="${product.stock > 5}"
-          class="badge bg-success"
-          th:text="${product.stock + ' Available'}">
-    </span>
+                        <a
+                            href="#featured-products"
+                            class="btn btn-warning btn-lg"
+                        >
+                            <i class="bi bi-bag-check me-2"></i>
+                            Shop Now
+                        </a>
 
-    <span th:if="${product.stock > 0 && product.stock <= 5}"
-          class="badge bg-warning text-dark"
-          th:text="${product.stock + ' Left'}">
-    </span>
+                        <a
+                            href="#featured-products"
+                            class="btn btn-outline-light btn-lg"
+                        >
+                            <i class="bi bi-grid me-2"></i>
+                            Browse Products
+                        </a>
 
-    <span th:if="${product.stock <= 0}"
-          class="badge bg-danger">
-        Out of Stock
-    </span>
-</p>
-                    <p>
-                        <span class="badge bg-secondary" th:text="${product.category}">
-                            Category
-                        </span>
-                    </p>
-                    
-                    <a th:href="@{/product/{id}(id=${product.id})}"
-                         class="btn btn-outline-dark w-100 mb-2">
-                              View Details
-                    </a>
+                    </div>
 
-                    <form th:action="@{/wishlist/add/{id}(id=${product.id})}"
-                            method="post"
-                            sec:authorize="isAuthenticated()">
+                </div>
 
-                            <button class="btn btn-outline-danger w-100 mb-2">
-                                <i class="bi bi-heart"></i>
-                                Add to Wishlist
-                            </button>
-                    </form>
+            </div>
 
-                    <a th:if="${product.stock > 0}"
-   th:href="@{/cart/add/{id}(id=${product.id})}"
-   class="btn btn-primary w-100">
-    <i class="bi bi-cart-plus"></i>
-    Add to Cart
-</a>
+            <!-- Hero Image -->
+            <div class="col-lg-6">
 
-<button th:if="${product.stock <= 0}"
-        class="btn btn-secondary w-100"
-        disabled>
-    Sold Out
-</button>
+                <div class="hero-image-wrapper">
 
+                    <img
+                        src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200"
+                        class="hero-image"
+                        alt="Modern computer technology and electronics"
+                    >
 
+                    <div class="hero-floating-card">
+
+                        <i class="bi bi-shield-check text-success"></i>
+
+                        <div>
+                            <div class="fw-bold">
+                                Secure Shopping
+                            </div>
+
+                            <small class="text-muted">
+                                Safe and reliable checkout
+                            </small>
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -361,6 +484,271 @@ class="img-fluid rounded shadow">
         </div>
 
     </div>
+
+</section>
+
+
+
+<!-- FEATURED -->
+
+<div id="featured-products" class="container py-5">
+
+    <div
+        class="d-flex flex-column flex-md-row
+               justify-content-between align-items-md-end
+               gap-2 mb-4"
+    >
+
+        <div>
+
+            <span class="text-primary fw-semibold text-uppercase small">
+                Explore our collection
+            </span>
+
+            <h2 class="fw-bold mb-1">
+                Featured Products
+            </h2>
+
+            <p class="text-muted mb-0">
+                Carefully selected technology for work, gaming, and daily use.
+            </p>
+
+        </div>
+
+        <span
+            class="badge rounded-pill text-bg-light border px-3 py-2"
+            th:if="${products != null}"
+        >
+            <span th:text="${#lists.size(products)}">0</span>
+            products found
+        </span>
+
+    </div>
+
+    <!-- ================= PRODUCT GRID ================= -->
+
+<div class="row g-4">
+
+    <!-- Error Message -->
+    <div
+        th:if="${error}"
+        class="col-12"
+    >
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <span th:text="${error}">Unable to load products.</span>
+        </div>
+    </div>
+
+    <!-- Empty Product Message -->
+    <div
+        th:if="${products == null or #lists.isEmpty(products)}"
+        class="col-12"
+    >
+        <div class="empty-products">
+
+            <i class="bi bi-box-seam"></i>
+
+            <h4>No products found</h4>
+
+            <p>
+                Try another search or check again later.
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Product Card -->
+    <div
+        class="col-xl-3 col-lg-4 col-md-6"
+        th:each="product : ${products}"
+    >
+
+        <article class="store-product-card">
+
+            <!-- Product Image Area -->
+            <div class="product-image-area">
+
+                <!-- Stock Badge -->
+                <span
+                    class="product-stock-badge in-stock"
+                    th:if="${product.stock != null and product.stock > 0}"
+                >
+                    In Stock
+                </span>
+
+                <span
+                    class="product-stock-badge out-of-stock"
+                    th:if="${product.stock != null and product.stock <= 0}"
+                >
+                    Out of Stock
+                </span>
+
+<!-- Wishlist Button -->
+<form
+    th:action="@{/wishlist/add/{id}(id=${product.id})}"
+    method="post"
+    class="wishlist-form"
+    sec:authorize="isAuthenticated()"
+>
+    <button
+        type="submit"
+        class="product-wishlist-button"
+        title="Add to wishlist"
+    >
+        <i class="bi bi-heart"></i>
+    </button>
+</form>
+
+<!-- Product Image Link -->
+<a
+    th:href="@{/product/{id}(id=${product.id})}"
+    class="product-image-link"
+>
+    <img
+        th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+        th:src="${product.imageUrl}"
+        th:alt="${product.name}"
+        class="product-card-image"
+    >
+
+    <div
+        th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+        class="product-image-placeholder"
+    >
+        <i class="bi bi-image"></i>
+    </div>
+</a>
+                <!-- Product Details Link -->
+                <a
+                   th:href="@{/product/{id}(id=${product.id})}"
+                    class="product-image-link"
+                >
+
+                    <img
+                        th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                        th:src="${product.imageUrl}"
+                        th:alt="${product.name}"
+                        class="product-card-image"
+                    >
+
+                    <div
+                        th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                        class="product-image-placeholder"
+                    >
+                        <i class="bi bi-image"></i>
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- Product Information -->
+            <div class="product-card-body">
+
+                <div class="product-category">
+                    Technology
+                </div>
+
+                <a
+                    th:href="@{/product/{id}(id=${product.id})}"
+                    class="product-name-link"
+                >
+                    <h3
+                        class="product-card-name"
+                        th:text="${product.name}"
+                    >
+                        Product Name
+                    </h3>
+                </a>
+
+                <p
+                    class="product-card-description"
+                    th:text="${product.description}"
+                >
+                    Product description appears here.
+                </p>
+
+                <!-- Rating -->
+                <div class="product-rating">
+
+                    <div class="product-rating-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star"></i>
+                    </div>
+
+                    <span class="product-rating-text">
+                        View reviews
+                    </span>
+
+                </div>
+
+                <!-- Price -->
+                <div class="product-price-row">
+
+                    <div
+                        class="product-card-price"
+                        th:text="'₱' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}"
+                    >
+                        ₱0.00
+                    </div>
+
+                    <small
+                        class="product-stock-count"
+                        th:if="${product.stock != null and product.stock > 0}"
+                    >
+                        <span th:text="${product.stock}">0</span>
+                        available
+                    </small>
+
+                </div>
+
+                <!-- Product Buttons -->
+                <div class="product-card-actions">
+
+                    <a
+                       th:href="@{/product/{id}(id=${product.id})}"
+                        class="btn product-details-button"
+                    >
+                        <i class="bi bi-eye"></i>
+                    </a>
+
+                 <form
+    th:action="@{/cart/add/{id}(id=${product.id})}"
+    method="post"
+    class="product-cart-form"
+>
+    <input type="hidden" name="quantity" value="1">
+
+    <button
+        type="submit"
+        class="btn product-cart-button"
+        th:disabled="${product.stock != null and product.stock <= 0}"
+    >
+        <i class="bi bi-cart-plus me-2"></i>
+
+        <span
+            th:text="${product.stock != null and product.stock <= 0}
+                ? 'Unavailable'
+                : 'Add to Cart'"
+        >
+            Add to Cart
+        </span>
+    </button>
+</form>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</div>
 
 </div>
 
@@ -435,13 +823,13 @@ Modern E-Commerce Platform for Tech Enthusiasts.
 
 <ul>
 
-<li>Home</li>
+<li><a href="/">Home</a></li>
 
-<li>Products</li>
+<li><a>Products</a></li>
 
-<li>About</li>
+<li><a>About</a></li>
 
-<li>Contact</li>
+<li><a>Contact</a></li>
 
 </ul>
 

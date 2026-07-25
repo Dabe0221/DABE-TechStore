@@ -209,11 +209,19 @@
                             Edit
                         </a>
 
+                         <a th:href="@{/admin/products/{id}/adjust-stock(id=${product.id})}"
+                            class="btn btn-sm btn-outline-success">
+                             <i class="bi bi-boxes me-1"></i>
+                                 Adjust Stock
+                                   </a> 
+
                         <a th:href="@{/admin/products/delete/{id}(id=${product.id})}"
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Delete this product?')">
                             Delete
                         </a>
+
+                
 
                     </div>
                 </td>

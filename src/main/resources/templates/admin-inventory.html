@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Inventory History</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            background-color: #f5f7fb;
+        }
+
+        .page-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .table thead th {
+            white-space: nowrap;
+        }
+
+        .quantity-positive {
+            color: #198754;
+            font-weight: 700;
+        }
+
+        .quantity-negative {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .stock-arrow {
+            color: #6c757d;
+            margin: 0 6px;
+        }
+
+        .performed-by {
+            max-width: 230px;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+
+        <a class="navbar-brand fw-bold"
+           th:href="@{/admin/dashboard}">
+            E-Commerce Admin
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#adminNavbar">
+
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="adminNavbar">
+
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/admin/dashboard}">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/admin/products}">
+                        Products
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/admin/orders}">
+                        Orders
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       th:href="@{/admin/inventory}">
+                        Inventory
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/admin/reports}">
+                        Sales Reports
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+            <h1 class="h3 fw-bold mb-1">
+                <i class="bi bi-box-seam me-2"></i>
+                Inventory History
+            </h1>
+
+            <p class="text-muted mb-0">
+                Track every product stock movement.
+            </p>
+        </div>
+
+        <a th:href="@{/admin/products}"
+           class="btn btn-outline-primary">
+
+            <i class="bi bi-boxes me-1"></i>
+            Manage Products
+        </a>
+    </div>
+
+    <div th:if="${successMessage}"
+         class="alert alert-success alert-dismissible fade show">
+
+        <span th:text="${successMessage}"></span>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${errorMessage}"
+         class="alert alert-danger alert-dismissible fade show">
+
+        <span th:text="${errorMessage}"></span>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card page-card mb-4">
+        <div class="card-body">
+
+            <form method="get"
+                  th:action="@{/admin/inventory}"
+                  class="row g-3 align-items-end">
+
+                <div class="col-md-5">
+
+                    <label for="keyword"
+                           class="form-label fw-semibold">
+                        Search Product
+                    </label>
+
+                    <input type="text"
+                           id="keyword"
+                           name="keyword"
+                           class="form-control"
+                           placeholder="Enter product name"
+                           th:value="${keyword}">
+                </div>
+
+                <div class="col-md-4">
+
+                    <label for="movementType"
+                           class="form-label fw-semibold">
+                        Movement Type
+                    </label>
+
+                    <select id="movementType"
+                            name="movementType"
+                            class="form-select">
+
+                        <option value=""
+                                th:selected="${movementType == null
+                                or movementType == ''}">
+                            All Movement Types
+                        </option>
+
+                        <option value="SALE"
+                                th:selected="${movementType == 'SALE'}">
+                            Sale
+                        </option>
+
+                        <option value="STOCK_IN"
+                                th:selected="${movementType == 'STOCK_IN'}">
+                            Stock In
+                        </option>
+
+                        <option value="RETURN"
+                                th:selected="${movementType == 'RETURN'}">
+                            Return
+                        </option>
+
+                        <option value="MANUAL_ADJUSTMENT"
+                                th:selected="${movementType == 'MANUAL_ADJUSTMENT'}">
+                            Manual Adjustment
+                        </option>
+
+                        <option value="OUT_OF_STOCK"
+                                th:selected="${movementType == 'OUT_OF_STOCK'}">
+                            Out of Stock
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary flex-grow-1">
+
+                        <i class="bi bi-search me-1"></i>
+                        Filter
+                    </button>
+
+                    <a th:href="@{/admin/inventory}"
+                       class="btn btn-outline-secondary">
+
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+
+                <input type="hidden"
+                       name="size"
+                       th:value="${movementPage.size}">
+            </form>
+        </div>
+    </div>
+
+    <div class="card page-card">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <div class="d-flex flex-column flex-sm-row
+                        justify-content-between align-items-sm-center
+                        gap-2">
+
+                <h2 class="h5 fw-bold mb-0">
+                    Stock Movements
+                </h2>
+
+                <span class="text-muted small"
+                      th:if="${movementPage != null}">
+
+                    Total:
+                    <strong th:text="${movementPage.totalElements}">
+                        0
+                    </strong>
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Date</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th class="text-center">Change</th>
+                        <th class="text-center">Stock</th>
+                        <th>Order</th>
+                        <th>Performed By</th>
+                        <th class="pe-4">Notes</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:if="${#lists.isEmpty(movements)}">
+
+                        <td colspan="8"
+                            class="text-center py-5">
+
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+
+                            <p class="text-muted mt-3 mb-0">
+                                No inventory movements found.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr th:each="movement : ${movements}">
+
+                        <td class="ps-4">
+
+                            <div class="fw-semibold"
+                                 th:text="${#temporals.format(
+                                    movement.createdAt,
+                                    'MMM dd, yyyy'
+                                 )}">
+                                Jul 23, 2026
+                            </div>
+
+                            <small class="text-muted"
+                                   th:text="${#temporals.format(
+                                    movement.createdAt,
+                                    'hh:mm a'
+                                   )}">
+                                10:30 AM
+                            </small>
+                        </td>
+
+                        <td>
+
+                            <div class="fw-semibold"
+                                 th:text="${movement.productName}">
+                                Product
+                            </div>
+
+                            <small class="text-muted">
+                                Product ID:
+                                <span th:text="${movement.productId}">
+                                    1
+                                </span>
+                            </small>
+                        </td>
+
+                        <td>
+
+                            <span th:if="${movement.movementType == 'SALE'}"
+                                  class="badge text-bg-danger">
+                                SALE
+                            </span>
+
+                            <span th:if="${movement.movementType == 'STOCK_IN'}"
+                                  class="badge text-bg-success">
+                                STOCK IN
+                            </span>
+
+                            <span th:if="${movement.movementType == 'RETURN'}"
+                                  class="badge text-bg-info">
+                                RETURN
+                            </span>
+
+                            <span th:if="${movement.movementType == 'MANUAL_ADJUSTMENT'}"
+                                  class="badge text-bg-warning">
+                                ADJUSTMENT
+                            </span>
+
+                            <span th:if="${movement.movementType == 'OUT_OF_STOCK'}"
+                                  class="badge text-bg-dark">
+                                OUT OF STOCK
+                            </span>
+
+                            <span th:unless="${movement.movementType == 'SALE'
+                                      or movement.movementType == 'STOCK_IN'
+                                      or movement.movementType == 'RETURN'
+                                      or movement.movementType == 'MANUAL_ADJUSTMENT'
+                                      or movement.movementType == 'OUT_OF_STOCK'}"
+                                  class="badge text-bg-secondary"
+                                  th:text="${movement.movementType}">
+                                OTHER
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+
+                            <span th:classappend="${movement.quantityChanged > 0}
+                                    ? 'quantity-positive'
+                                    : 'quantity-negative'">
+
+                                <span th:if="${movement.quantityChanged > 0}">
+                                    +
+                                </span>
+
+                                <span th:text="${movement.quantityChanged}">
+                                    -1
+                                </span>
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+
+                            <span th:text="${movement.stockBefore}">
+                                10
+                            </span>
+
+                            <i class="bi bi-arrow-right stock-arrow"></i>
+
+                            <strong th:text="${movement.stockAfter}">
+                                9
+                            </strong>
+                        </td>
+
+                        <td>
+
+                            <a th:if="${movement.orderId != null}"
+                               th:href="@{/admin/order-details(id=${movement.orderId})}"
+                               class="text-decoration-none fw-semibold">
+
+                                #
+                                <span th:text="${movement.orderId}">
+                                    1
+                                </span>
+                            </a>
+
+                            <span th:if="${movement.orderId == null}"
+                                  class="text-muted">
+                                —
+                            </span>
+                        </td>
+
+                        <td class="performed-by"
+                            th:text="${movement.performedBy != null
+                                    and !movement.performedBy.isBlank()
+                                    ? movement.performedBy
+                                    : 'System'}">
+                            System
+                        </td>
+
+                        <td class="pe-4"
+                            th:text="${movement.notes != null
+                                    and !movement.notes.isBlank()
+                                    ? movement.notes
+                                    : '—'}">
+                            —
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 px-4 py-3"
+             th:if="${movementPage != null
+                     and movementPage.totalPages > 0}">
+
+            <div class="d-flex flex-column flex-md-row
+                        justify-content-between align-items-md-center
+                        gap-3">
+
+                <div class="text-muted small">
+
+                    Page
+                    <strong th:text="${movementPage.number + 1}">
+                        1
+                    </strong>
+
+                    of
+
+                    <strong th:text="${movementPage.totalPages}">
+                        1
+                    </strong>
+                </div>
+
+                <nav aria-label="Inventory pagination">
+
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item"
+                            th:classappend="${movementPage.first}
+                                    ? 'disabled'">
+
+                            <a class="page-link"
+                               th:href="@{/admin/inventory(
+                                    keyword=${keyword},
+                                    movementType=${movementType},
+                                    page=${movementPage.number - 1},
+                                    size=${movementPage.size}
+                               )}">
+                                Previous
+                            </a>
+                        </li>
+
+                        <li class="page-item"
+                            th:each="pageNumber :
+                                ${#numbers.sequence(
+                                    0,
+                                    movementPage.totalPages - 1
+                                )}"
+                            th:classappend="${pageNumber == movementPage.number}
+                                    ? 'active'">
+
+                            <a class="page-link"
+                               th:href="@{/admin/inventory(
+                                    keyword=${keyword},
+                                    movementType=${movementType},
+                                    page=${pageNumber},
+                                    size=${movementPage.size}
+                               )}"
+                               th:text="${pageNumber + 1}">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item"
+                            th:classappend="${movementPage.last}
+                                    ? 'disabled'">
+
+                            <a class="page-link"
+                               th:href="@{/admin/inventory(
+                                    keyword=${keyword},
+                                    movementType=${movementType},
+                                    page=${movementPage.number + 1},
+                                    size=${movementPage.size}
+                               )}">
+                                Next
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+</body>
+</html>

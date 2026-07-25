@@ -1,485 +1,1685 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>
+      Admin Dashboard
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <style>
+      body {
+        background: #f4f7fb;
+}
+
+.dashboard-card,
+.content-card,
+.quick-action {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-card,
+.quick-action {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover,
+.quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.09);
+}
+
+.metric-icon {
+        width: 52px;
+        height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        font-size: 1.4rem;
+}
+
+.quick-action {
+        display: block;
+        height: 100%;
+        padding: 1.25rem;
+        color: inherit;
+        text-decoration: none;
+        background: #ffffff;
+}
+
+.quick-action i {
+        font-size: 1.8rem;
+}
+
+.notification-menu {
+        width: 360px;
+        max-height: 430px;
+        overflow-y: auto;
+}
+
+.notification-message {
+        white-space: normal;
+}
+
+.activity-list {
+        max-height: 520px;
+        overflow-y: auto;
+}
+
+.notification-card-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #edf0f3;
+}
+
+.notification-card-item:last-child {
+    border-bottom: none;
+}
+
+.notification-card-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    font-size: 1.1rem;
+}
+
+.notification-card-message {
+    line-height: 1.4;
+}
+
+.notification-card-time {
+    font-size: 0.78rem;
+}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-
-<body class="bg-light">
-
-<div class="container my-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>📊 Admin Dashboard</h1>
-
-        <a th:href="@{/}" class="btn btn-secondary">
-            Back to Store
-        </a>
-    </div>
-
-    <!-- TOP CARDS -->
-   <div class="row g-4 mb-4">
-
-        <div class="col-md-3">
-            <div class="card shadow text-center">
-                <div class="card-body">
-                    <h6>Total Products</h6>
-                    <h2 th:text="${totalProducts}">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow text-center">
-                <div class="card-body">
-                    <h6>Total Orders</h6>
-                    <h2 th:text="${totalOrders}">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow text-center">
-                <div class="card-body">
-                    <h6>Customers</h6>
-                    <h2 th:text="${totalCustomers}">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow text-center bg-success text-white h-100">
-                <div class="card-body">
-                    <h6>Total Revenue</h6>
-                    <h2>₱<span th:text="${#numbers.formatDecimal(totalRevenue,1,'COMMA',2,'POINT')}"></span></h2>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- SECOND CARDS -->
-    <div class="row g-4 mb-5">
-
-        <div class="col-md-4">
-            <div class="card shadow text-center h-100">
-                <div class="card-body">
-                    <h6>Pending Orders</h6>
-                    <h2 th:text="${pendingOrders}">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow text-center">
-                <div class="card-body">
-                    <h6>Delivered Orders</h6>
-                    <h2 th:text="${deliveredOrders}">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow text-center">
-                <div class="card-body">
-                    <h6>Orders Today</h6>
-                    <h2 th:text="${ordersToday}">0</h2>
-                </div>
-            </div>
-        </div>
-    </div>
- <div class="card shadow mb-5">
-    <div class="card-header bg-dark text-white">
-        📈 Revenue This Week
-    </div>
-
-    <div class="card-body">
-        <canvas id="revenueChart" height="100"></canvas>
-    </div>
-</div>
-
-<div class="card shadow mb-5">
-    <div class="card-header bg-dark text-white">
-        📦 Orders by Status
-    </div>
-
-    <div class="card-body">
-        <canvas id="orderStatusChart" height="100"></canvas>
-    </div>
-</div>
-
-<div class="row g-4 mb-4">
-
-    <div class="col-md-4 col-lg-2">
-        <div class="card shadow-sm text-center h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Processing</h6>
-                <h2 class="text-primary"
-                    th:text="${processingOrders}">
-                    0
-                </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 col-lg-2">
-        <div class="card shadow-sm text-center h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Shipped</h6>
-                <h2 class="text-info"
-                    th:text="${shippedOrders}">
-                    0
-                </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 col-lg-2">
-        <div class="card shadow-sm text-center h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Cancelled</h6>
-                <h2 class="text-danger"
-                    th:text="${cancelledOrders}">
-                    0
-                </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 col-lg-3">
-        <div class="card shadow-sm text-center h-100 border-success">
-            <div class="card-body">
-                <h6 class="text-muted">Paid Orders</h6>
-                <h2 class="text-success"
-                    th:text="${paidOrders}">
-                    0
-                </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 col-lg-3">
-        <div class="card shadow-sm text-center h-100 border-warning">
-            <div class="card-body">
-                <h6 class="text-muted">Unpaid / Pending</h6>
-                <h2 class="text-warning"
-                    th:text="${unpaidOrders}">
-                    0
-                </h2>
-            </div>
-        </div>
-    </div>
-
-</div>
-   <!-- TABLES -->
-<div class="row g-4">
-
-    <div class="col-lg-6">
-        <div class="card shadow h-100">
-            <div class="card-header bg-dark text-white">
-                ⚠ Low Stock Products
-            </div>
-
-            <div class="card-body">
-                <table class="table table-bordered table-hover">  
-                    <thead class="table-dark">
-                    <tr>
-                        <th>Product</th>
-                        <th>Stock</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-
-            <tr th:if="${#lists.isEmpty(lowStockProducts)}">
-    <td colspan="2" class="text-center text-muted">
-        No low-stock products.
-    </td>
-</tr>
-                        
-                    <tr th:each="product : ${lowStockProducts}">
-                        <td th:text="${product.name}"></td>
-                        <td>
-                            <span class="badge bg-danger"
-                                  th:text="${product.stock}">
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-<div class="col-lg-6">
-    <div class="card shadow h-100">
-        <div class="card-header bg-dark text-white">
-            ⭐ Highest Rated Products
-        </div>
-
-        <div class="card-body">
-            <table class="table table-bordered table-hover">
-                <thead class="table-dark">
-                <tr>
-                    <th>Product</th>
-                    <th>Rating</th>
-                    <th>Reviews</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr th:each="item : ${highestRatedProducts}">
-                    <td th:text="${item[0]}">Product</td>
-                    <td>
-                        ⭐
-                        <span th:text="${#numbers.formatDecimal(item[1], 1, 1)}">
-                            0.0
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge bg-primary"
-                              th:text="${item[2]}">
-                            0
-                        </span>
-                    </td>
-                </tr>
-
-                <tr th:if="${#lists.isEmpty(highestRatedProducts)}">
-                    <td colspan="3"
-                        class="text-center text-muted">
-                        No ratings available.
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-    <div class="col-lg-6">
-        <div class="card shadow h-100">
-            <div class="card-header bg-dark text-white">
-                🏆 Top Selling Products
-            </div>
-
-            <div class="card-body">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>Product</th>
-                        <th>Sold</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr th:if="${#lists.isEmpty(topSellingProducts)}">
-    <td colspan="2" class="text-center text-muted">
-        No sales data available.
-    </td>
-</tr>
-
-                    <tr th:each="item : ${topSellingProducts}">
-                        <td th:text="${item[0]}">Product</td>
-                        <td>
-                            <span class="badge bg-success"
-                                  th:text="${item[1]}">
-                                0
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card shadow h-100">
-            <div class="card-header bg-dark text-white">
-                🧾 Recent Orders
-            </div>
-
-            <div class="card-body">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr th:if="${#lists.isEmpty(recentOrders)}">
-    <td colspan="4" class="text-center text-muted">
-        No recent orders.
-    </td>
-</tr>
-                         
-                    <tr th:each="order : ${recentOrders}">
-                        <td th:text="${order.id}"></td>
-                        <td th:text="${order.customerName}"></td>
-                        <td>₱<span
-                    th:text="${#numbers.formatDecimal(order.totalAmount,1,'COMMA',2,'POINT')}">
-                            </span>
-                    </td>
-                        <td>
-                            <span class="badge bg-warning text-dark"
-                                  th:text="${order.status}">
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    
-
-<div class="col-12">
-
-    <div class="card shadow mt-4">
-        <div class="card-header bg-dark text-white">
-            Recent Activity
-        </div>
-
-        <div class="card-body">
-
-            <div th:if="${#lists.isEmpty(recentActivities)}"
-                 class="text-muted text-center py-3">
-                No activity recorded yet.
-            </div>
-
-            <div class="list-group list-group-flush"
-                 th:if="${!#lists.isEmpty(recentActivities)}">
-
-                <div class="list-group-item"
-                     th:each="activity : ${recentActivities}">
-
-                    <div class="d-flex justify-content-between
-                                align-items-start gap-3">
-
-                        <strong th:text="${activity.action}">
-                            ACTION
-                        </strong>
-
-                        <small class="text-muted text-nowrap"
-                               th:text="${#temporals.format(
-                                   activity.createdAt,
-                                   'MMM d, yyyy h:mm a'
-                               )}">
-                        </small>
-
-                    </div>
-
-                    <div th:text="${activity.description}">
-                        Description
-                    </div>
-
-                    <small class="text-muted">
-                        By:
-                        <span th:text="${activity.performedBy}">
-                            admin
-                        </span>
-                    </small>
-
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-</div>
-
-
-</div>
-
-    <!-- BUTTONS -->
-    <div class="mt-5">
-      <a th:href="@{/}" class="btn btn-secondary">
-    Back to Store
-</a>
-
-<a th:href="@{/admin/products}" class="btn btn-primary">
-    Manage Products
-</a>
-
-<a th:href="@{/admin/orders}" class="btn btn-success">
-    Manage Orders
-</a>
-
-<a th:href="@{/admin/reports}"
-   class="btn btn-dark">
-    Sales Reports
-</a>
-
-</div>  
-
-</div>
-
-<script th:inline="javascript">
-    const labels = /*[[${revenueLabels}]]*/ [];
-    const data = /*[[${revenueData}]]*/ [];
-
-    const ctx = document.getElementById('revenueChart');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Revenue',
-                data: data,
-                tension: 0.4
-            }]
+.notification-unread {
+    background-color: #f8fbff;
+}
+
+.chart-box {
+
+    height: 360px;
+
+    position: relative;
+
+}
+
+.table thead th {
+        white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+        .notification-menu {
+                width: 300px;
         }
-    });
+}
 
-const orderStatusLabels =
-        /*[[${orderStatusLabels}]]*/ [];
+.inventory-summary-item {
+    padding: 1rem;
+    border-radius: 14px;
+    background-color: #f8f9fa;
+    height: 100%;
+}
 
-const orderStatusData =
-        /*[[${orderStatusData}]]*/ [];
+.inventory-summary-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
 
-const orderStatusCanvas =
-        document.getElementById('orderStatusChart');
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-new Chart(orderStatusCanvas, {
-    type: 'doughnut',
-    data: {
-        labels: orderStatusLabels,
-        datasets: [{
-            label: 'Orders',
-            data: orderStatusData
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
+    border-radius: 13px;
+    font-size: 1.25rem;
+}
+
+.inventory-summary-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.inventory-summary-value {
+    margin-top: 0.15rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.navbar .nav-link {
+
+    transition: .25s;
+
+}
+
+.navbar .nav-link:hover {
+
+    background: rgba(255,255,255,.08);
+
+    border-radius: 10px;
+
+}
+
+canvas{
+
+    transition:.3s;
+
+}
+
+.card:hover canvas{
+
+    transform:scale(1.01);
+
+}
+
+/* ==================================================
+   ADMIN NAVBAR
+================================================== */
+
+.admin-navbar {
+    min-height: 76px;
+    padding: 0;
+    background: #212529;
+    border-bottom: 1px solid #343a40;
+}
+
+.admin-navbar .container-fluid {
+    min-height: 76px;
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    font-size: 1.45rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-brand:hover,
+.admin-brand:focus {
+    color: #ffffff;
+}
+
+.admin-navbar .navbar-nav {
+    gap: 0.15rem;
+}
+
+.admin-navbar .nav-link {
+    padding: 1.65rem 0.7rem;
+    color: #adb5bd;
+    font-size: 1rem;
+    font-weight: 400;
+    background: transparent;
+    border-radius: 0;
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.admin-navbar .nav-link:hover {
+    color: #ffffff;
+    background: transparent;
+}
+
+.admin-navbar .nav-link.active {
+    color: #ffffff;
+    background: transparent;
+    border-radius: 0;
+    font-weight: 500;
+}
+
+.admin-icon-button {
+    position: relative;
+    padding: 1.35rem 0.6rem;
+    color: #adb5bd;
+    border: none;
+    background: transparent;
+}
+
+.admin-icon-button:hover,
+.admin-icon-button:focus,
+.admin-icon-button.show {
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.notification-count {
+    position: absolute;
+    top: 4px;
+    right: -1px;
+    min-width: 22px;
+}
+
+.notification-menu {
+    width: 360px;
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.notification-unread {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.store-link {
+    display: flex;
+    align-items: center;
+}
+
+.admin-navbar .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.admin-navbar .navbar-toggler:focus {
+    box-shadow: none;
+}
+
+@media (max-width: 991.98px) {
+
+    .admin-navbar {
+        padding: 0.75rem 0;
     }
 
+    .admin-navbar .container-fluid {
+        min-height: auto;
+    }
+
+    .admin-navbar .navbar-collapse {
+        padding-top: 0.75rem;
+    }
+
+    .admin-navbar .nav-link {
+        padding: 0.75rem;
+    }
+
+    .admin-icon-button {
+        padding: 0.75rem;
+        text-align: left;
+    }
+
+    .notification-count {
+        top: 0;
+        left: 25px;
+        right: auto;
+    }
+
+    .notification-menu {
+        width: 100%;
+    }
+}
+
+    </style>
+  </head>
+  <body>
+   <nav class="navbar navbar-expand-lg admin-navbar">
+
+    <div class="container-fluid px-4">
+
+        <!-- BRAND -->
+        <a
+            class="navbar-brand admin-brand"
+            th:href="@{/admin/dashboard}"
+        >
+            <i class="bi bi-speedometer2 me-2"></i>
+         Admin
+        </a>
+
+        <!-- MOBILE TOGGLE -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#adminNavbar"
+            aria-controls="adminNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- NAVIGATION -->
+        <div
+            class="collapse navbar-collapse"
+            id="adminNavbar"
+        >
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                <!-- DASHBOARD -->
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        th:href="@{/admin/dashboard}"
+                        th:classappend="${activePage == 'dashboard'} ? ' active' : ''"
+                    >
+                        Dashboard
+                    </a>
+                </li>
+
+                <!-- PRODUCTS -->
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        th:href="@{/admin/products}"
+                        th:classappend="${activePage == 'products'} ? ' active' : ''"
+                    >
+                        Products
+                    </a>
+                </li>
+
+                <!-- ORDERS -->
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        th:href="@{/admin/orders}"
+                        th:classappend="${activePage == 'orders'} ? ' active' : ''"
+                    >
+                        Orders
+                    </a>
+                </li>
+
+                <!-- INVENTORY -->
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        th:href="@{/admin/inventory}"
+                        th:classappend="${activePage == 'inventory'} ? ' active' : ''"
+                    >
+                        Inventory
+                    </a>
+                </li>
+
+                <!-- REPORTS -->
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        th:href="@{/admin/reports}"
+                        th:classappend="${activePage == 'reports'} ? ' active' : ''"
+                    >
+                        Reports
+                    </a>
+                </li>
+
+                <!-- NOTIFICATIONS -->
+                <li class="nav-item dropdown ms-lg-2">
+
+                    <button
+                        class="btn admin-icon-button position-relative"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        <i class="bi bi-bell fs-5"></i>
+
+                        <span
+                            th:if="${unreadNotificationCount != null
+                                and unreadNotificationCount > 0}"
+                            class="notification-count badge rounded-pill bg-danger"
+                            th:text="${unreadNotificationCount}"
+                        >
+                            0
+                        </span>
+                    </button>
+
+                    <div
+                        class="dropdown-menu dropdown-menu-end shadow notification-menu"
+                    >
+
+                        <div
+                            class="d-flex justify-content-between
+                                   align-items-center
+                                   px-3 py-2 border-bottom"
+                        >
+                            <h6 class="mb-0">
+                                Notifications
+                            </h6>
+
+                            <form
+                                th:if="${unreadNotificationCount != null
+                                    and unreadNotificationCount > 0}"
+                                th:action="@{/admin/notifications/mark-all-read}"
+                                method="post"
+                            >
+                                <button
+                                    class="btn btn-sm btn-link
+                                           text-decoration-none p-0"
+                                    type="submit"
+                                >
+                                    Mark all read
+                                </button>
+                            </form>
+                        </div>
+
+                        <div
+                            th:if="${recentNotifications == null
+                                or #lists.isEmpty(recentNotifications)}"
+                            class="text-center text-muted py-4"
+                        >
+                            No notifications yet.
+                        </div>
+
+                        <a
+                            th:each="notification : ${recentNotifications}"
+                            th:href="@{/admin/notifications/{id}/read(
+                                id=${notification.id},
+                                redirect=${notification.link}
+                            )}"
+                            class="dropdown-item py-3 border-bottom"
+                            th:classappend="${!notification.readStatus}
+                                ? ' notification-unread'
+                                : ''"
+                        >
+
+                            <div class="d-flex gap-3">
+
+                                <i
+                                    th:if="${notification.type == 'NEW_ORDER'}"
+                                    class="bi bi-cart-check text-success"
+                                ></i>
+
+                                <i
+                                    th:if="${notification.type == 'LOW_STOCK'}"
+                                    class="bi bi-exclamation-triangle text-warning"
+                                ></i>
+
+                                <i
+                                    th:if="${notification.type == 'NEW_REVIEW'}"
+                                    class="bi bi-star-fill text-primary"
+                                ></i>
+
+                                <i
+                                    th:if="${notification.type == 'TEST'}"
+                                    class="bi bi-bell text-secondary"
+                                ></i>
+
+                                <div class="flex-grow-1">
+
+                                    <div
+                                        class="text-wrap"
+                                        th:text="${notification.message}"
+                                    >
+                                        Notification
+                                    </div>
+
+                                    <small
+                                        class="text-muted"
+                                        th:text="${#temporals.format(
+                                            notification.createdAt,
+                                            'MMM dd, yyyy hh:mm a'
+                                        )}"
+                                    >
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                </li>
+
+                <!-- STORE -->
+                <li class="nav-item ms-lg-1">
+                    <a
+                        class="nav-link store-link"
+                        th:href="@{/}"
+                    >
+                        <i class="bi bi-shop me-1"></i>
+                        Store
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+    <main class="container-fluid px-lg-4 py-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h1 class="h2 fw-bold mb-1">
+            Admin Dashboard
+          </h1>
+          <p class="text-muted mb-0">
+            Monitor store performance, orders, stock, and activity.
+          </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-primary" th:href="@{/admin/add-product}">
+            <i class="bi bi-plus-circle me-1">
+            </i>
+            Add Product
+          </a>
+          <a class="btn btn-outline-success" th:href="@{/admin/inventory}">
+            <i class="bi bi-box-seam me-1">
+            </i>
+            Inventory
+          </a>
+        </div>
+      </div>
+      <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small">
+                  Total Products
+                </div>
+                <div class="fs-2 fw-bold" th:text="${totalProducts}">
+                  0
+                </div>
+              </div>
+              <div class="metric-icon bg-primary-subtle text-primary">
+                <i class="bi bi-boxes">
+                </i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small">
+                  Total Orders
+                </div>
+                <div class="fs-2 fw-bold" th:text="${totalOrders}">
+                  0
+                </div>
+              </div>
+              <div class="metric-icon bg-warning-subtle text-warning">
+                <i class="bi bi-bag-check">
+                </i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small">
+                  Customers
+                </div>
+                <div class="fs-2 fw-bold" th:text="${totalCustomers}">
+                  0
+                </div>
+              </div>
+              <div class="metric-icon bg-info-subtle text-info">
+                <i class="bi bi-people">
+                </i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100 bg-success text-white">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="small opacity-75">
+                  Total Revenue
+                </div>
+                <div class="fs-3 fw-bold">
+                  ₱
+                  <span th:text="${#numbers.formatDecimal(totalRevenue,1,'COMMA',2,'POINT')}">
+                    0.00
+                  </span>
+                </div>
+              </div>
+              <div class="metric-icon bg-white bg-opacity-25 text-white">
+                <i class="bi bi-cash-stack">
+                </i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section class="mb-4">
+        <h2 class="h5 fw-bold mb-3">
+          Quick Actions
+        </h2>
+        <div class="row g-3">
+          <div class="col-sm-6 col-lg-3">
+            <a class="quick-action" th:href="@{/admin/products}">
+              <i class="bi bi-boxes text-primary">
+              </i>
+              <h3 class="h6 fw-bold mt-3">
+                Products
+              </h3>
+              <p class="text-muted small mb-0">
+                Add, edit, delete, and adjust product stock.
+              </p>
+            </a>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <a class="quick-action" th:href="@{/admin/orders}">
+              <i class="bi bi-receipt text-success">
+              </i>
+              <h3 class="h6 fw-bold mt-3">
+                Orders
+              </h3>
+              <p class="text-muted small mb-0">
+                Review orders, payments, and delivery status.
+              </p>
+            </a>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <a class="quick-action" th:href="@{/admin/inventory}">
+              <i class="bi bi-box-seam text-warning">
+              </i>
+              <h3 class="h6 fw-bold mt-3">
+                Inventory
+              </h3>
+              <p class="text-muted small mb-0">
+                View stock movements and inventory history.
+              </p>
+            </a>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <a class="quick-action" th:href="@{/admin/reports}">
+              <i class="bi bi-file-earmark-bar-graph text-danger">
+              </i>
+              <h3 class="h6 fw-bold mt-3">
+                Sales Reports
+              </h3>
+              <p class="text-muted small mb-0">
+                Analyze sales and export PDF reports.
+              </p>
+            </a>
+          </div>
+        </div>
+      </section>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card content-card text-center h-100">
+            <div class="card-body">
+              <div class="text-muted small">
+                Pending
+              </div>
+              <div class="fs-3 fw-bold text-warning" th:text="${pendingOrders}">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card content-card text-center h-100">
+            <div class="card-body">
+              <div class="text-muted small">
+                Processing
+              </div>
+              <div class="fs-3 fw-bold text-primary" th:text="${processingOrders}">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card content-card text-center h-100">
+            <div class="card-body">
+              <div class="text-muted small">
+                Shipped
+              </div>
+              <div class="fs-3 fw-bold text-info" th:text="${shippedOrders}">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card content-card text-center h-100">
+            <div class="card-body">
+              <div class="text-muted small">
+                Delivered
+              </div>
+              <div class="fs-3 fw-bold text-success" th:text="${deliveredOrders}">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card content-card text-center h-100">
+            <div class="card-body">
+              <div class="text-muted small">
+                Cancelled
+              </div>
+              <div class="fs-3 fw-bold text-danger" th:text="${cancelledOrders}">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card content-card text-center h-100">
+            <div class="card-body">
+              <div class="text-muted small">
+                Orders Today
+              </div>
+              <div class="fs-3 fw-bold" th:text="${ordersToday}">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4 mb-4">
+        <div class="col-xl-8">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3 border-0">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-graph-up-arrow me-2">
+                </i>
+                Revenue Trend
+              </h2>
+            </div>
+            <div class="card-body chart-box">
+              <canvas id="revenueChart">
+              </canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-pie-chart me-2">
+                </i>
+                Orders by Status
+              </h2>
+            </div>
+            <div class="card-body chart-box">
+              <canvas id="orderStatusChart">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4 mb-4">
+        <div class="col-xl-6">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-exclamation-triangle text-warning me-2">
+                </i>
+                Low Stock Products
+              </h2>
+              <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/inventory}">
+                Inventory
+              </a>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-4">
+                        Product
+                      </th>
+                      <th>
+                        Stock
+                      </th>
+                      <th class="text-end pe-4">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:if="${#lists.isEmpty(lowStockProducts)}">
+                      <td class="text-center text-muted py-4" colspan="3">
+                        No low-stock products.
+                      </td>
+                    </tr>
+                    <tr th:each="product : ${lowStockProducts}">
+                      <td class="ps-4 fw-semibold" th:text="${product.name}">
+                        Product
+                      </td>
+                      <td>
+                        <span class="badge" th:classappend="${product.stock == 0} ? ' text-bg-dark' : ' text-bg-danger'" th:text="${product.stock}">
+                          0
+                        </span>
+                      </td>
+                      <td class="text-end pe-4">
+                        <a class="btn btn-sm btn-outline-success" th:href="@{/admin/products/{id}/adjust-stock(id=${product.id})}">
+                          Adjust Stock
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-trophy text-warning me-2">
+                </i>
+                Top Selling Products
+              </h2>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-4">
+                        Product
+                      </th>
+                      <th class="text-end pe-4">
+                        Units Sold
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:if="${#lists.isEmpty(topSellingProducts)}">
+                      <td class="text-center text-muted py-4" colspan="2">
+                        No sales data available.
+                      </td>
+                    </tr>
+                    <tr th:each="item : ${topSellingProducts}">
+                      <td class="ps-4 fw-semibold" th:text="${item[0]}">
+                        Product
+                      </td>
+                      <td class="text-end pe-4">
+                        <span class="badge text-bg-success" th:text="${item[1]}">
+                          0
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4 mb-4">
+        <div class="col-xl-7">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-receipt me-2">
+                </i>
+                Recent Orders
+              </h2>
+              <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/orders}">
+                View All
+              </a>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-4">
+                        Order
+                      </th>
+                      <th>
+                        Customer
+                      </th>
+                      <th>
+                        Total
+                      </th>
+                      <th class="pe-4">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:if="${#lists.isEmpty(recentOrders)}">
+                      <td class="text-center text-muted py-4" colspan="4">
+                        No recent orders.
+                      </td>
+                    </tr>
+                    <tr th:each="order : ${recentOrders}">
+                      <td class="ps-4">
+                        <a class="text-decoration-none fw-semibold" th:href="@{/admin/order-details(id=${order.id})}">
+                          #
+                          <span th:text="${order.id}">
+                            1
+                          </span>
+                        </a>
+                      </td>
+                      <td th:text="${order.customerName}">
+                        Customer
+                      </td>
+                      <td>
+                        ₱
+                        <span th:text="${#numbers.formatDecimal(order.totalAmount,1,'COMMA',2,'POINT')}">
+                          0.00
+                        </span>
+                      </td>
+                      <td class="pe-4">
+                        <span class="badge" th:classappend="${order.status == 'Delivered'} ? ' text-bg-success' : (${order.status == 'Cancelled'} ? ' text-bg-danger' : (${order.status == 'Shipped'} ? ' text-bg-info' : ' text-bg-warning'))" th:text="${order.status}">
+                          Pending
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-5">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-star text-warning me-2">
+                </i>
+                Highest Rated Products
+              </h2>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-4">
+                        Product
+                      </th>
+                      <th>
+                        Rating
+                      </th>
+                      <th class="text-end pe-4">
+                        Reviews
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:if="${#lists.isEmpty(highestRatedProducts)}">
+                      <td class="text-center text-muted py-4" colspan="3">
+                        No ratings available.
+                      </td>
+                    </tr>
+                    <tr th:each="item : ${highestRatedProducts}">
+                      <td class="ps-4 fw-semibold" th:text="${item[0]}">
+                        Product
+                      </td>
+                      <td>
+                        <i class="bi bi-star-fill text-warning">
+                        </i>
+                        <span th:text="${#numbers.formatDecimal(item[1],1,1)}">
+                          0.0
+                        </span>
+                      </td>
+                      <td class="text-end pe-4">
+                        <span class="badge text-bg-primary" th:text="${item[2]}">
+                          0
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Recent & Payment summary -->
+
+<div class="d-flex align-items-center gap-2 mb-3">
+
+    <i class="bi bi-activity text-primary"></i>
+
+    <h2 class="h5 fw-bold mb-0">
+        Store Management Overview
+    </h2>
+
+</div>
+
+      <div class="row g-4">
+        <div class="col-xl-8">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-clock-history me-2">
+                </i>
+                Recent Activity
+              </h2>
+            </div>
+            <div class="card-body activity-list">
+              <div class="text-muted text-center py-4" th:if="${#lists.isEmpty(recentActivities)}">
+                No activity recorded yet.
+              </div>
+              <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(recentActivities)}">
+                <div class="list-group-item px-0 py-3" th:each="activity : ${recentActivities}">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <strong th:text="${activity.action}">
+                      ACTION
+                    </strong>
+                    <small class="text-muted text-nowrap" th:text="${#temporals.format(activity.createdAt,'MMM d, yyyy h:mm a')}">
+                    </small>
+                  </div>
+                  <div class="mt-1" th:text="${activity.description}">
+                    Description
+                  </div>
+                  <small class="text-muted">
+                    By:
+                    <span th:text="${activity.performedBy != null ? activity.performedBy : 'System'}">
+                      admin
+                    </span>
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4">
+          <div class="card content-card h-100">
+            <div class="card-header bg-white py-3">
+              <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-credit-card me-2">
+                </i>
+                Payment Summary
+              </h2>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                <span class="text-muted">
+                  Paid Orders
+                </span>
+                <span class="badge text-bg-success fs-6" th:text="${paidOrders}">
+                  0
+                </span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                <span class="text-muted">
+                  Unpaid / Pending
+                </span>
+                <span class="badge text-bg-warning fs-6" th:text="${unpaidOrders}">
+                  0
+                </span>
+              </div>
+              <div class="d-grid gap-2 mt-4">
+                <a class="btn btn-outline-success" th:href="@{/admin/orders(paymentStatus='Paid')}">
+                  View Paid Orders
+                </a>
+                <a class="btn btn-outline-warning" th:href="@{/admin/orders(paymentStatus='Unpaid')}">
+                  View Unpaid Orders
+                </a>
+                <a class="btn btn-dark" th:href="@{/admin/reports}">
+                  Open Sales Reports
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<!-- Recent Notifications -->
+<section class="mt-4">
+
+    <div class="card content-card">
+
+        <!-- Card Header -->
+        <div
+            class="card-header bg-white py-3
+                   d-flex flex-column flex-sm-row
+                   justify-content-between align-items-sm-center gap-2"
+        >
+
+            <div class="d-flex align-items-center gap-2">
+
+                <i class="bi bi-bell-fill text-primary"></i>
+
+                <h2 class="h5 fw-bold mb-0">
+                    Recent Notifications
+                </h2>
+
+                <span
+                    th:if="${unreadNotificationCount != null
+                           and unreadNotificationCount > 0}"
+                    class="badge rounded-pill text-bg-danger"
+                    th:text="${unreadNotificationCount}"
+                >
+                    0
+                </span>
+
+            </div>
+
+            <form
+                th:if="${unreadNotificationCount != null
+                       and unreadNotificationCount > 0}"
+                th:action="@{/admin/notifications/mark-all-read}"
+                method="post"
+            >
+
+                <button
+                    type="submit"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                    <i class="bi bi-check2-all me-1"></i>
+                    Mark All as Read
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body py-2">
+
+            <!-- Empty State -->
+            <div
+                th:if="${recentNotifications == null
+                       or #lists.isEmpty(recentNotifications)}"
+                class="text-center text-muted py-5"
+            >
+
+                <i class="bi bi-bell-slash fs-1 d-block mb-2"></i>
+
+                <p class="mb-0">
+                    No notifications available.
+                </p>
+
+            </div>
+
+            <!-- Notification Items -->
+            <div
+                th:each="notification, notificationStat
+                         : ${recentNotifications}"
+                th:if="${notificationStat.index < 5}"
+                class="notification-card-item"
+                th:classappend="${!notification.readStatus}
+                    ? ' notification-unread'
+                    : ''"
+            >
+
+                <a
+                    th:href="@{/admin/notifications/{id}/read(
+                        id=${notification.id},
+                        redirect=${notification.link}
+                    )}"
+                    class="d-flex align-items-start gap-3
+                           text-decoration-none text-dark px-2"
+                >
+
+                    <!-- Icon -->
+                    <div
+                        class="notification-card-icon"
+                        th:classappend="${notification.readStatus}
+                            ? ' bg-secondary-subtle text-secondary'
+                            : ' bg-primary-subtle text-primary'"
+                    >
+
+                        <i
+                            class="bi"
+                            th:classappend="${notification.readStatus}
+                                ? ' bi-check-circle'
+                                : ' bi-info-circle-fill'"
+                        ></i>
+
+                    </div>
+
+                    <!-- Notification Information -->
+                    <div class="flex-grow-1">
+
+                        <div
+                            class="notification-card-message"
+                            th:classappend="${!notification.readStatus}
+                                ? ' fw-semibold'
+                                : ' text-muted'"
+                            th:text="${notification.message}"
+                        >
+                            Notification message
+                        </div>
+
+                        <div
+                            class="notification-card-time text-muted mt-1"
+                        >
+
+                            <i class="bi bi-clock me-1"></i>
+
+                            <span
+                                th:text="${#temporals.format(
+                                    notification.createdAt,
+                                    'MMM d, yyyy h:mm a'
+                                )}"
+                            >
+                                Jul 23, 2026 8:00 PM
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Unread Indicator -->
+                    <span
+                        th:if="${!notification.readStatus}"
+                        class="badge rounded-pill text-bg-primary"
+                    >
+                        New
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Inventory Summary -->
+<section class="mt-4">
+
+    <div class="card content-card">
+
+        <!-- Header -->
+        <div
+            class="card-header bg-white py-3
+                   d-flex flex-column flex-sm-row
+                   justify-content-between align-items-sm-center gap-2"
+        >
+
+            <div class="d-flex align-items-center gap-2">
+
+                <i class="bi bi-box-seam-fill text-success"></i>
+
+                <h2 class="h5 fw-bold mb-0">
+                    Inventory Summary
+                </h2>
+
+            </div>
+
+            <a
+                th:href="@{/admin/inventory}"
+                class="btn btn-sm btn-outline-success"
+            >
+                <i class="bi bi-arrow-right-circle me-1"></i>
+                View Inventory
+            </a>
+
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- Total Products -->
+                <div class="col-sm-6 col-xl-3">
+
+                    <div class="inventory-summary-item">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div
+                                class="inventory-summary-icon
+                                       bg-primary-subtle text-primary"
+                            >
+                                <i class="bi bi-boxes"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="inventory-summary-label">
+                                    Total Products
+                                </div>
+
+                                <div
+                                    class="inventory-summary-value"
+                                    th:text="${totalInventoryProducts}"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Available Stock -->
+                <div class="col-sm-6 col-xl-3">
+
+                    <div class="inventory-summary-item">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div
+                                class="inventory-summary-icon
+                                       bg-success-subtle text-success"
+                            >
+                                <i class="bi bi-box-check"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="inventory-summary-label">
+                                    Available Stock
+                                </div>
+
+                                <div
+                                    class="inventory-summary-value"
+                                    th:text="${totalAvailableStock}"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Low Stock -->
+                <div class="col-sm-6 col-xl-3">
+
+                    <div class="inventory-summary-item">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div
+                                class="inventory-summary-icon
+                                       bg-warning-subtle text-warning"
+                            >
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="inventory-summary-label">
+                                    Low Stock
+                                </div>
+
+                                <div
+                                    class="inventory-summary-value"
+                                    th:text="${lowStockCount}"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Out of Stock -->
+                <div class="col-sm-6 col-xl-3">
+
+                    <div class="inventory-summary-item">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div
+                                class="inventory-summary-icon
+                                       bg-danger-subtle text-danger"
+                            >
+                                <i class="bi bi-x-octagon"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="inventory-summary-label">
+                                    Out of Stock
+                                </div>
+
+                                <div
+                                    class="inventory-summary-value"
+                                    th:text="${outOfStockCount}"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
 
 
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script th:inline="javascript">
+      const revenueLabels = /*[[${revenueLabels}]]*/ [];
+const revenueData = /*[[${revenueData}]]*/ [];
+const orderStatusLabels = /*[[${orderStatusLabels}]]*/ [];
+const orderStatusData = /*[[${orderStatusData}]]*/ [];
+
+const revenueCanvas = document.getElementById("revenueChart");
+
+if (revenueCanvas) {
+
+    const ctx = revenueCanvas.getContext("2d");
+
+    const gradient = ctx.createLinearGradient(0,0,0,360);
+
+    gradient.addColorStop(0,"rgba(13,110,253,.35)");
+    gradient.addColorStop(.6,"rgba(13,110,253,.15)");
+    gradient.addColorStop(1,"rgba(13,110,253,.02)");
+
+    new Chart(ctx,{
+
+        type:"line",
+
+        data:{
+
+            labels: revenueLabels,
+
+            datasets:[{
+
+                label:"Revenue",
+
+                data: revenueData,
+
+                fill:true,
+
+                backgroundColor: gradient,
+
+                borderColor:"#0d6efd",
+
+                borderWidth:3,
+
+                tension:.4,
+
+                pointRadius:4,
+
+                pointHoverRadius:8,
+
+                pointBackgroundColor:"#0d6efd",
+
+                pointBorderColor:"#fff",
+
+                pointBorderWidth:2
+
+            }]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            animation:{
+                duration:1800
+            },
+
+            plugins:{
+
+                legend:{
+                    display:false
+                },
+
+                tooltip:{
+
+                    callbacks:{
+
+                        label:function(context){
+
+                            return "₱ "
+                                   + context.parsed.y
+                                   .toLocaleString();
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales:{
+
+                y:{
+
+                    beginAtZero:true,
+
+                    ticks:{
+
+                        callback:function(value){
+
+                            return "₱"
+                                   + value.toLocaleString();
+
+                        }
+
+                    },
+
+                    grid:{
+                        color:"#eef2f7"
+                    }
+
+                },
+
+                x:{
+
+                    grid:{
+                        display:false
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
 
 
-});
+const orderStatusCanvas =
+document.getElementById("orderStatusChart");
 
+if(orderStatusCanvas){
 
+    new Chart(orderStatusCanvas,{
 
-</script>
+        type:"doughnut",
 
-</body>
+        data:{
+
+            labels:orderStatusLabels,
+
+            datasets:[{
+
+                data:orderStatusData,
+
+                borderWidth:3,
+
+                hoverOffset:18,
+
+                backgroundColor:[
+
+                    "#0d6efd",
+
+                    "#ffc107",
+
+                    "#20c997",
+
+                    "#dc3545",
+
+                    "#6f42c1",
+
+                    "#fd7e14"
+
+                ]
+
+            }]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            cutout:"68%",
+
+            animation:{
+
+                animateRotate:true,
+
+                duration:1500
+
+            },
+
+            plugins:{
+
+                legend:{
+
+                    position:"bottom",
+
+                    labels:{
+
+                        usePointStyle:true,
+
+                        padding:18
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+    </script>
+  </body>
 </html>

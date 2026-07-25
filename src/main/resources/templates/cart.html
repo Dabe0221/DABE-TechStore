@@ -1,89 +1,553 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>Your Cart</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Your Shopping Cart | DABE TechStore</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 
-<body>
+<body class="cart-page">
 
-<div class="container my-5">
+<!-- ================= CART NAVBAR ================= -->
 
-    <a th:href="@{/}" class="btn btn-secondary mb-4">
-    Back to Store
-</a>
+<nav class="navbar navbar-dark cart-navbar">
+    <div class="container">
 
-    <h1 class="mb-4">Your Shopping Cart</h1>
+        <a th:href="@{/}"
+           class="navbar-brand d-flex align-items-center gap-2">
 
-    <div th:if="${error}" class="alert alert-danger">
-    <span th:text="${error}"></span>
-</div>
+            <span class="cart-brand-icon">
+                <i class="bi bi-cpu-fill"></i>
+            </span>
 
-    <div th:if="${#lists.isEmpty(cart.items)}">
-        <div class="alert alert-warning">
-            Your cart is empty.
-        </div>
-    </div>
-
-    <div th:if="${!#lists.isEmpty(cart.items)}">
-
-        <table class="table table-bordered align-middle">
-            <thead class="table-dark">
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Qty</th>
-                <th>Subtotal</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="item : ${cart.items}">
-                <td th:text="${item.product.name}">Product Name</td>
-                <td>₱<span th:text="${item.product.price}">0</span></td>
-<td>
-    <div class="d-flex align-items-center gap-2">
-        <a th:href="@{/cart/decrease/{id}(id=${item.product.id})}"
-           class="btn btn-outline-secondary btn-sm">
-            -
+            <span>DABE TechStore</span>
         </a>
 
-        <span th:text="${item.quantity}">1</span>
+        <a th:href="@{/}"
+           class="btn btn-outline-light">
 
-        <a th:href="@{/cart/increase/{id}(id=${item.product.id})}"
-   class="btn btn-outline-secondary btn-sm">
-    +
-</a>
+            <i class="bi bi-arrow-left me-2"></i>
+            Continue Shopping
+        </a>
+
     </div>
-</td>
-                <td>₱<span th:text="${item.subtotal}">0</span></td>
-                <td>
-                    <a th:href="@{/cart/remove/{id}(id=${item.product.id})}"
-                       class="btn btn-danger btn-sm">
-                        Remove
+</nav>
+
+<!-- ================= MAIN CART ================= -->
+
+<main class="container cart-container">
+
+    <!-- Page Header -->
+    <div class="cart-page-header">
+
+        <div>
+            <span class="cart-page-label">
+                Your selected products
+            </span>
+
+            <h1 class="cart-page-title">
+                <i class="bi bi-cart3 me-2"></i>
+                Shopping Cart
+            </h1>
+
+            <p class="cart-page-description">
+                Review your products and quantities before checkout.
+            </p>
+        </div>
+
+        <div class="cart-item-count"
+             th:if="${cart != null and cart.items != null}">
+
+            <i class="bi bi-bag-check me-2"></i>
+
+            <span th:text="${#lists.size(cart.items)}">
+                0
+            </span>
+
+            <span th:text="${#lists.size(cart.items) == 1
+                    ? 'product'
+                    : 'products'}">
+                products
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- Error Message -->
+    <div th:if="${error}"
+         class="alert alert-danger cart-alert">
+
+        <i class="bi bi-exclamation-circle-fill me-2"></i>
+
+        <span th:text="${error}">
+            An error occurred.
+        </span>
+
+    </div>
+
+    <!-- ================= EMPTY CART ================= -->
+
+    <section th:if="${cart == null
+                    or cart.items == null
+                    or #lists.isEmpty(cart.items)}"
+             class="empty-cart-section">
+
+        <div class="empty-cart-icon">
+            <i class="bi bi-cart-x"></i>
+        </div>
+
+        <h2>Your cart is empty</h2>
+
+        <p>
+            You have not added any products to your shopping cart yet.
+            Browse our collection and find something you will love.
+        </p>
+
+        <a th:href="@{/}"
+           class="btn btn-warning btn-lg empty-cart-button">
+
+            <i class="bi bi-bag-plus me-2"></i>
+            Start Shopping
+        </a>
+
+    </section>
+
+    <!-- ================= CART CONTENT ================= -->
+
+    <div th:if="${cart != null
+                and cart.items != null
+                and !#lists.isEmpty(cart.items)}"
+         class="row g-4">
+
+        <!-- ================= CART ITEMS ================= -->
+
+        <div class="col-lg-8">
+
+            <section class="cart-products-section">
+
+                <div class="cart-section-header">
+
+                    <div>
+                        <h2>Cart Items</h2>
+
+                        <p>
+                            Update quantities or remove products from your cart.
+                        </p>
+                    </div>
+
+                    <i class="bi bi-bag-check cart-section-icon"></i>
+
+                </div>
+
+                <!-- Individual Product -->
+                <article class="cart-product-card"
+                         th:each="item : ${cart.items}">
+
+                    <div class="row align-items-center g-3">
+
+                        <!-- Product Image -->
+                        <div class="col-md-3 col-4">
+
+                            <a th:href="@{/product/{id}(id=${item.product.id})}"
+                               class="cart-product-image-wrapper">
+
+                                <img th:if="${item.product.imageUrl != null
+                                           and !#strings.isEmpty(item.product.imageUrl)}"
+                                     th:src="${item.product.imageUrl}"
+                                     th:alt="${item.product.name}"
+                                     class="cart-product-image">
+
+                                <div th:unless="${item.product.imageUrl != null
+                                               and !#strings.isEmpty(item.product.imageUrl)}"
+                                     class="cart-product-placeholder">
+
+                                    <i class="bi bi-image"></i>
+
+                                </div>
+
+                            </a>
+
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="col-md-5 col-8">
+
+                            <div class="cart-product-category">
+                                Technology
+                            </div>
+
+                            <a th:href="@{/product/{id}(id=${item.product.id})}"
+                               class="cart-product-name">
+
+                                <span th:text="${item.product.name}">
+                                    Product Name
+                                </span>
+
+                            </a>
+
+                            <p class="cart-product-description"
+                               th:if="${item.product.description != null}"
+                               th:text="${item.product.description}">
+
+                                Product description
+
+                            </p>
+
+                            <div class="cart-stock-status"
+                                 th:if="${item.product.stock != null
+                                         and item.product.stock > 0}">
+
+                                <i class="bi bi-check-circle-fill"></i>
+                                In Stock
+
+                            </div>
+
+                            <div class="cart-stock-status out-of-stock"
+                                 th:if="${item.product.stock != null
+                                         and item.product.stock <= 0}">
+
+                                <i class="bi bi-x-circle-fill"></i>
+                                Out of Stock
+
+                            </div>
+
+                            <div class="cart-mobile-price d-md-none">
+
+                                ₱<span th:text="${#numbers.formatDecimal(
+                                        item.product.price,
+                                        1,
+                                        'COMMA',
+                                        2,
+                                        'POINT')}">
+                                    0.00
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Unit Price -->
+                        <div class="col-md-2 d-none d-md-block text-center">
+
+                            <span class="cart-column-label">
+                                Price
+                            </span>
+
+                            <div class="cart-unit-price">
+
+                                ₱<span th:text="${#numbers.formatDecimal(
+                                        item.product.price,
+                                        1,
+                                        'COMMA',
+                                        2,
+                                        'POINT')}">
+                                    0.00
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Subtotal -->
+                        <div class="col-md-2 d-none d-md-block text-end">
+
+                            <span class="cart-column-label">
+                                Subtotal
+                            </span>
+
+                            <div class="cart-product-subtotal">
+
+                                ₱<span th:text="${#numbers.formatDecimal(
+                                        item.subtotal,
+                                        1,
+                                        'COMMA',
+                                        2,
+                                        'POINT')}">
+                                    0.00
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Product Controls -->
+                    <div class="cart-product-controls">
+
+                        <!-- Quantity -->
+                        <div class="cart-quantity-group">
+
+                            <span class="cart-control-label">
+                                Quantity
+                            </span>
+
+                            <div class="cart-quantity-control">
+
+                                <a th:href="@{/cart/decrease/{id}
+                                    (id=${item.product.id})}"
+                                   class="cart-quantity-button"
+                                   title="Decrease quantity">
+
+                                    <i class="bi bi-dash-lg"></i>
+
+                                </a>
+
+                                <span class="cart-quantity-value"
+                                      th:text="${item.quantity}">
+                                    1
+                                </span>
+
+                                <a th:href="@{/cart/increase/{id}
+                                    (id=${item.product.id})}"
+                                   class="cart-quantity-button"
+                                   title="Increase quantity">
+
+                                    <i class="bi bi-plus-lg"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Mobile Subtotal -->
+                        <div class="cart-mobile-subtotal d-md-none">
+
+                            <span>Subtotal</span>
+
+                            <strong>
+                                ₱<span th:text="${#numbers.formatDecimal(
+                                        item.subtotal,
+                                        1,
+                                        'COMMA',
+                                        2,
+                                        'POINT')}">
+                                    0.00
+                                </span>
+                            </strong>
+
+                        </div>
+
+                        <!-- Remove -->
+                        <a th:href="@{/cart/remove/{id}
+                            (id=${item.product.id})}"
+                           class="cart-remove-button">
+
+                            <i class="bi bi-trash3 me-2"></i>
+                            Remove
+
+                        </a>
+
+                    </div>
+
+                </article>
+
+                <!-- Continue Shopping -->
+                <div class="cart-bottom-action">
+
+                    <a th:href="@{/}"
+                       class="btn cart-continue-button">
+
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Continue Shopping
+
                     </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
 
-       <h3 class="text-end">
-    Total: ₱<span th:text="${cart.total}">0</span>
-</h3>
+                </div>
 
-<div class="text-end mt-3">
-   <a th:href="@{/checkout}" class="btn btn-success btn-lg">
-    Checkout
-</a>
-</div>
+            </section>
 
-</div>
+        </div>
 
-</div>
+        <!-- ================= ORDER SUMMARY ================= -->
+
+        <div class="col-lg-4">
+
+            <aside class="cart-summary-card">
+
+                <div class="cart-summary-header">
+
+                    <div>
+                        <span>Checkout details</span>
+                        <h2>Order Summary</h2>
+                    </div>
+
+                    <i class="bi bi-receipt"></i>
+
+                </div>
+
+                <div class="cart-summary-body">
+
+                    <div class="cart-summary-row">
+
+                        <span>
+                            Products
+                        </span>
+
+                        <strong th:text="${#lists.size(cart.items)}">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="cart-summary-row">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <strong>
+                            ₱<span th:text="${#numbers.formatDecimal(
+                                    cart.total,
+                                    1,
+                                    'COMMA',
+                                    2,
+                                    'POINT')}">
+                                0.00
+                            </span>
+                        </strong>
+
+                    </div>
+
+                    <div class="cart-summary-row">
+
+                        <span>
+                            Shipping
+                        </span>
+
+                        <strong class="text-success">
+                            FREE
+                        </strong>
+
+                    </div>
+
+                    <div class="cart-summary-row">
+
+                        <span>
+                            Discount
+                        </span>
+
+                        <strong>
+                            ₱0.00
+                        </strong>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="cart-summary-total">
+
+                        <div>
+                            <span>Total</span>
+
+                            <small>
+                                Inclusive of applicable charges
+                            </small>
+                        </div>
+
+                        <strong>
+                            ₱<span th:text="${#numbers.formatDecimal(
+                                    cart.total,
+                                    1,
+                                    'COMMA',
+                                    2,
+                                    'POINT')}">
+                                0.00
+                            </span>
+                        </strong>
+
+                    </div>
+
+                    <a th:href="@{/checkout}"
+                       class="btn btn-warning cart-checkout-button">
+
+                        <i class="bi bi-lock-fill me-2"></i>
+                        Proceed to Checkout
+
+                    </a>
+
+                    <div class="cart-secure-checkout">
+
+                        <i class="bi bi-shield-check"></i>
+
+                        <div>
+                            <strong>Secure checkout</strong>
+
+                            <span>
+                                Your order information is protected.
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+            <!-- Shopping Benefits -->
+            <div class="cart-benefits-card">
+
+                <div class="cart-benefit">
+
+                    <i class="bi bi-truck"></i>
+
+                    <div>
+                        <strong>Fast Delivery</strong>
+                        <span>Reliable order processing</span>
+                    </div>
+
+                </div>
+
+                <div class="cart-benefit">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    <div>
+                        <strong>Secure Shopping</strong>
+                        <span>Protected customer information</span>
+                    </div>
+
+                </div>
+
+                <div class="cart-benefit">
+
+                    <i class="bi bi-headset"></i>
+
+                    <div>
+                        <strong>Customer Support</strong>
+                        <span>Help whenever you need it</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 </html>

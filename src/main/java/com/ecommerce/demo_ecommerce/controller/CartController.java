@@ -39,33 +39,7 @@ public class CartController {
         return "cart";
     }
 
-    @GetMapping("/cart/add/{id}")
-public String addToCart(@PathVariable Long id,
-                        HttpSession session,
-                        RedirectAttributes redirectAttributes) {
 
-    Product product = productService.getProductById(id);
-
-    if (product == null || product.getStock() <= 0) {
-        redirectAttributes.addFlashAttribute("error", "Product is out of stock.");
-        return "redirect:/";
-    }
-
-    ShoppingCart cart = getCart(session);
-
-    int quantityInCart = cart.getQuantityByProductId(id);
-
-    if (quantityInCart >= product.getStock()) {
-        redirectAttributes.addFlashAttribute(
-                "error",
-                "Only " + product.getStock() + " item(s) available in stock.");
-        return "redirect:/cart";
-    }
-
-    cart.addProduct(product);
-
-    return "redirect:/cart";
-}
 
     @GetMapping("/cart/increase/{id}")
 public String increaseQuantity(@PathVariable Long id,
@@ -106,27 +80,40 @@ public String increaseQuantity(@PathVariable Long id,
         return "redirect:/cart";
     }
 
-    @PostMapping("/cart/add/{id}")
-public String addToCartWithQuantity(@PathVariable Long id,
-                                    @RequestParam int quantity,
-                                    HttpSession session,
-                                    RedirectAttributes redirectAttributes) {
+@PostMapping("/cart/add/{id}")
+public String addToCartWithQuantity(
+        @PathVariable Long id,
+        @RequestParam(defaultValue = "1") int quantity,
+        HttpSession session,
+        RedirectAttributes redirectAttributes) {
 
     Product product = productService.getProductById(id);
 
     if (product == null || product.getStock() <= 0) {
-        redirectAttributes.addFlashAttribute("error", "Product is out of stock.");
+        redirectAttributes.addFlashAttribute(
+                "error",
+                "Product is out of stock."
+        );
+
         return "redirect:/";
+    }
+
+    if (quantity < 1) {
+        quantity = 1;
     }
 
     ShoppingCart cart = getCart(session);
 
-    int quantityInCart = cart.getQuantityByProductId(id);
+    int quantityInCart =
+            cart.getQuantityByProductId(id);
 
     if (quantityInCart + quantity > product.getStock()) {
         redirectAttributes.addFlashAttribute(
                 "error",
-                "Only " + product.getStock() + " item(s) available in stock.");
+                "Only " + product.getStock()
+                        + " item(s) available in stock."
+        );
+
         return "redirect:/product/" + id;
     }
 
