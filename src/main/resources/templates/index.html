@@ -35,18 +35,24 @@
                bg-warning text-dark rounded-3"
         style="width: 40px; height: 40px;"
     >
-        <i class="bi bi-cpu-fill"></i>
+        <i class="bi bi-cpu-fill" aria-hidden="true"></i>
     </span>
 
     <span>DABE TechStore</span>
 </a>
 
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#nav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+       <button class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#nav"
+        aria-controls="nav"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+
+    <span class="navbar-toggler-icon"
+          aria-hidden="true"></span>
+
+</button>
 
         <div class="collapse navbar-collapse" id="nav">
 
@@ -57,7 +63,7 @@
 >
 
     <input
-        class="form-control"
+        class="form-control store-input"
         type="search"
         name="keyword"
         th:value="${keyword}"
@@ -66,11 +72,11 @@
     >
 
     <button
-        class="btn btn-warning"
+        class="btn btn-store-primary"
         type="submit"
         aria-label="Submit search"
     >
-        <i class="bi bi-search"></i>
+        <i class="bi bi-search" aria-hidden="true"></i>
     </button>
 
 </form>
@@ -80,7 +86,7 @@
     <!-- LOGIN -->
     <li class="nav-item" sec:authorize="!isAuthenticated()">
         <a class="nav-link" href="/login">
-            <i class="bi bi-person"></i>
+            <i class="bi bi-person" aria-hidden="true"></i>
             Login
         </a>
     </li>
@@ -100,7 +106,7 @@
            role="button"
            data-bs-toggle="dropdown">
 
-            <i class="bi bi-shield-lock-fill"></i>
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
             Admin
 
         </a>
@@ -154,22 +160,22 @@
     <li class="nav-item dropdown ms-2"
         sec:authorize="hasRole('ADMIN')">
 
-        <button
-                class="btn btn-outline-light position-relative"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">
+        <button class="btn btn-outline-light position-relative"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        aria-label="Open notifications">
 
-            <i class="bi bi-bell-fill"></i>
+    <i class="bi bi-bell-fill"
+       aria-hidden="true"></i>
 
-            <span
-                    th:if="${unreadNotificationCount > 0}"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    th:text="${unreadNotificationCount}">
-                0
-            </span>
+    <span th:if="${unreadNotificationCount > 0}"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          th:text="${unreadNotificationCount}">
+        0
+    </span>
 
-        </button>
+</button>
 
         <div class="dropdown-menu dropdown-menu-end shadow p-0"
              style="width:360px;max-height:450px;overflow-y:auto;">
@@ -377,7 +383,7 @@
         th:href="@{/cart}"
         class="nav-link nav-icon-button"
     >
-        <i class="bi bi-cart3 fs-5"></i>
+        <i class="bi bi-cart3 fs-5" aria-hidden="true"></i>
 
         <span>Cart</span>
 
@@ -397,9 +403,11 @@
     </div>
 </nav>
 
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
+
 <!-- ================= HERO ================= -->
 
-<section class="store-hero">
+<section class="store-hero store-section">
 
     <div class="container">
 
@@ -410,8 +418,8 @@
 
                 <div class="hero-content">
 
-                    <div class="hero-badge">
-                        <i class="bi bi-lightning-charge-fill text-warning"></i>
+                   <div class="hero-badge store-badge">
+                        <i class="bi bi-lightning-charge-fill text-warning" aria-hidden="true"></i>
                         New technology. Better prices.
                     </div>
 
@@ -430,17 +438,17 @@
 
                         <a
                             href="#featured-products"
-                            class="btn btn-warning btn-lg"
+                            class="btn btn-store-primary btn-lg"
                         >
-                            <i class="bi bi-bag-check me-2"></i>
+                            <i class="bi bi-bag-check me-2" aria-hidden="true"></i>
                             Shop Now
                         </a>
 
                         <a
                             href="#featured-products"
-                            class="btn btn-outline-light btn-lg"
+                            class="btn btn-store-secondary btn-lg"
                         >
-                            <i class="bi bi-grid me-2"></i>
+                            <i class="bi bi-grid me-2" aria-hidden="true"></i>
                             Browse Products
                         </a>
 
@@ -463,7 +471,7 @@
 
                     <div class="hero-floating-card">
 
-                        <i class="bi bi-shield-check text-success"></i>
+                        <i class="bi bi-shield-check text-success" aria-hidden="true"></i>
 
                         <div>
                             <div class="fw-bold">
@@ -501,11 +509,11 @@
 
         <div>
 
-            <span class="text-primary fw-semibold text-uppercase small">
+            <span class="section-label">
                 Explore our collection
             </span>
 
-            <h2 class="fw-bold mb-1">
+            <h2 class="page-title mb-1">
                 Featured Products
             </h2>
 
@@ -535,7 +543,7 @@
         class="col-12"
     >
         <div class="alert alert-danger">
-            <i class="bi bi-exclamation-circle me-2"></i>
+            <i class="bi bi-exclamation-circle me-2" aria-hidden="true"></i>
             <span th:text="${error}">Unable to load products.</span>
         </div>
     </div>
@@ -564,7 +572,7 @@
         th:each="product : ${products}"
     >
 
-        <article class="store-product-card">
+        <article class="store-product-card store-card store-hover">
 
             <!-- Product Image Area -->
             <div class="product-image-area">
@@ -590,35 +598,22 @@
     method="post"
     class="wishlist-form"
     sec:authorize="isAuthenticated()"
->
-    <button
-        type="submit"
+    data-loading-form>
+
+    <button type="submit"
         class="product-wishlist-button"
-        title="Add to wishlist"
-    >
-        <i class="bi bi-heart"></i>
-    </button>
+        th:aria-label="'Add ' + ${product.name} + ' to wishlist'"
+        th:title="'Add ' + ${product.name} + ' to wishlist'"
+        data-loading-button
+        data-loading-text="Adding...">
+
+    <i class="bi bi-heart"
+       aria-hidden="true"></i>
+
+</button>
 </form>
 
-<!-- Product Image Link -->
-<a
-    th:href="@{/product/{id}(id=${product.id})}"
-    class="product-image-link"
->
-    <img
-        th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
-        th:src="${product.imageUrl}"
-        th:alt="${product.name}"
-        class="product-card-image"
-    >
 
-    <div
-        th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
-        class="product-image-placeholder"
-    >
-        <i class="bi bi-image"></i>
-    </div>
-</a>
                 <!-- Product Details Link -->
                 <a
                    th:href="@{/product/{id}(id=${product.id})}"
@@ -636,7 +631,7 @@
                         th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
                         class="product-image-placeholder"
                     >
-                        <i class="bi bi-image"></i>
+                        <i class="bi bi-image" aria-hidden="true"></i>
                     </div>
 
                 </a>
@@ -672,17 +667,20 @@
                 <!-- Rating -->
                 <div class="product-rating">
 
-                    <div class="product-rating-stars">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star"></i>
-                    </div>
+     <div class="product-rating-stars"
+     aria-hidden="true">
 
-                    <span class="product-rating-text">
-                        View reviews
-                    </span>
+    <i class="bi bi-star-fill"></i>
+    <i class="bi bi-star-fill"></i>
+    <i class="bi bi-star-fill"></i>
+    <i class="bi bi-star-fill"></i>
+    <i class="bi bi-star"></i>
+
+</div>
+
+<span class="visually-hidden">
+    Rated 4 out of 5 stars
+</span>
 
                 </div>
 
@@ -709,35 +707,42 @@
                 <!-- Product Buttons -->
                 <div class="product-card-actions">
 
-                    <a
-                       th:href="@{/product/{id}(id=${product.id})}"
-                        class="btn product-details-button"
-                    >
-                        <i class="bi bi-eye"></i>
-                    </a>
+                  <a th:href="@{/product/{id}(id=${product.id})}"
+                         class="btn product-details-button btn-store-secondary"
+                         th:aria-label="'View details for ' + ${product.name}"
+                         th:title="'View details for ' + ${product.name}">
 
-                 <form
-    th:action="@{/cart/add/{id}(id=${product.id})}"
-    method="post"
-    class="product-cart-form"
->
-    <input type="hidden" name="quantity" value="1">
+                            <i class="bi bi-eye"
+                             aria-hidden="true"></i>
 
-    <button
-        type="submit"
-        class="btn product-cart-button"
-        th:disabled="${product.stock != null and product.stock <= 0}"
-    >
-        <i class="bi bi-cart-plus me-2"></i>
+                                 </a>
 
-        <span
-            th:text="${product.stock != null and product.stock <= 0}
+   <form th:action="@{/cart/add/{id}(id=${product.id})}"
+      method="post"
+      class="product-cart-form"
+      data-loading-form>
+
+    <input type="hidden"
+           name="quantity"
+           value="1">
+
+    <button type="submit"
+            class="btn product-cart-button btn-store-primary"
+            th:disabled="${product.stock != null and product.stock <= 0}"
+            data-loading-button
+            data-loading-text="Adding...">
+
+        <i class="bi bi-cart-plus me-2"
+           aria-hidden="true"></i>
+
+        <span th:text="${product.stock != null and product.stock <= 0}
                 ? 'Unavailable'
-                : 'Add to Cart'"
-        >
+                : 'Add to Cart'">
             Add to Cart
         </span>
+
     </button>
+
 </form>
 
                 </div>
@@ -774,20 +779,28 @@ Subscribe for exclusive discounts.
 
 <div class="col-lg-6">
 
-<div class="input-group">
+<form class="input-group"
+      onsubmit="return false;">
 
-<input
-type="email"
-class="form-control"
-placeholder="Enter your email">
+    <label for="newsletterEmail"
+           class="visually-hidden">
+        Email address
+    </label>
 
-<button class="btn btn-warning">
+    <input id="newsletterEmail"
+           type="email"
+           name="email"
+           class="form-control store-input"
+           placeholder="Enter your email"
+           autocomplete="email"
+           required>
 
-Subscribe
+    <button type="submit"
+            class="btn btn-store-primary">
+        Subscribe
+    </button>
 
-</button>
-
-</div>
+</form>
 
 </div>
 
@@ -799,7 +812,7 @@ Subscribe
 
 <!-- FOOTER -->
 
-<footer>
+<footer class="store-footer">
 
 <div class="container">
 
@@ -825,7 +838,7 @@ Modern E-Commerce Platform for Tech Enthusiasts.
 
 <li><a href="/">Home</a></li>
 
-<li><a>Products</a></li>
+<li><a href="#featured-products"> Products </a></li>
 
 <li><a>About</a></li>
 
@@ -835,15 +848,25 @@ Modern E-Commerce Platform for Tech Enthusiasts.
 
 </div>
 
-<div class="col-md-4">
+<div class="store-social-links">
 
-<h5>Follow Us</h5>
+    <a href="#"
+       aria-label="Visit our Facebook page">
+        <i class="bi bi-facebook fs-3"
+           aria-hidden="true"></i>
+    </a>
 
-<i class="bi bi-facebook fs-3 me-2"></i>
+    <a href="#"
+       aria-label="Visit our Instagram page">
+        <i class="bi bi-instagram fs-3"
+           aria-hidden="true"></i>
+    </a>
 
-<i class="bi bi-instagram fs-3 me-2"></i>
-
-<i class="bi bi-twitter-x fs-3"></i>
+    <a href="#"
+       aria-label="Visit our X page">
+        <i class="bi bi-twitter-x fs-3"
+           aria-hidden="true"></i>
+    </a>
 
 </div>
 
@@ -864,6 +887,8 @@ Modern E-Commerce Platform for Tech Enthusiasts.
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="/js/script.js"></script>
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
 
 </body>
 </html>

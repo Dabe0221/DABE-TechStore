@@ -1,58 +1,588 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>My Orders</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>My Orders | DABE TechStore</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 
-<body>
-<div class="container my-5">
+<body class="orders-page">
 
-    <a href="/" class="btn btn-secondary mb-4">Back to Store</a>
+<!-- ================= NAVBAR ================= -->
 
-    <h1>My Orders</h1>
+<nav class="navbar navbar-expand-lg navbar-dark orders-navbar">
 
-    <table class="table table-bordered table-hover mt-4">
-        <thead class="table-dark">
-        <tr>
-            <th>Order ID</th>
-            <th>Date</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-        </thead>
+    <div class="container">
 
-        <tbody>
-          <tr th:each="order : ${orders}">
-            <tbody>
-<tr th:each="order : ${orders}">
-    <td th:text="${order.id}">1</td>
+        <a th:href="@{/}"
+           class="navbar-brand d-flex align-items-center gap-2">
 
-    <td th:text="${order.orderDate}">Date</td>
+            <span class="orders-brand-icon">
+                <i class="bi bi-cpu-fill" aria-hidden="true"></i>
+            </span>
 
-    <td>₱<span th:text="${order.totalAmount}">0</span></td>
+            <span>DABE TechStore</span>
 
-    <td>
-        <span class="badge bg-warning text-dark"
-              th:text="${order.status}">
-            Pending
-        </span>
-    </td>
-
-    <td>
-        <a th:href="@{/my-orders/{id}(id=${order.id})}"
-           class="btn btn-primary btn-sm">
-            View Details
         </a>
-    </td>
-</tr>
-</tbody>
-    </table>
 
-    
+        <div class="orders-navbar-actions">
 
-</div>
+            <a th:href="@{/}"
+               class="btn orders-store-button">
+
+                <i class="bi bi-shop me-2" aria-hidden="true"></i>
+                Back to Store
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
+
+<!-- ================= PAGE CONTENT ================= -->
+
+<main class="container orders-container">
+
+    <!-- Header -->
+
+    <section class="orders-page-header store-section-header">
+
+        <div>
+
+            <span class="orders-page-label section-label">
+                Purchase history
+            </span>
+
+            <h1 class="orders-page-title page-title">
+
+                <i class="bi bi-box-seam me-2"
+                   aria-hidden="true"></i>
+                My Orders
+
+            </h1>
+
+            <p class="orders-page-description">
+                Review your previous purchases, monitor order progress,
+                and open the complete details of each order.
+            </p>
+
+        </div>
+
+        <a th:href="@{/}"
+           class="btn orders-shopping-button btn-store-secondary">
+
+            <i class="bi bi-bag-plus me-2" aria-hidden="true"></i>
+            Continue Shopping
+
+        </a>
+
+    </section>
+
+    <!-- Optional Message -->
+
+    <div th:if="${message}"
+         class="alert alert-success orders-alert"
+         role="status">
+
+        <i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i>
+
+        <span th:text="${message}">
+            Order update
+        </span>
+
+    </div>
+
+    <div th:if="${error}"
+         class="alert alert-danger orders-alert"
+         role="alert">
+
+        <i class="bi bi-exclamation-circle-fill me-2" aria-hidden="true"></i>
+
+        <span th:text="${error}">
+            Unable to load orders.
+        </span>
+
+    </div>
+
+    <!-- ================= ORDERS AVAILABLE ================= -->
+
+    <div th:if="${orders != null and !#lists.isEmpty(orders)}"
+         class="row g-4">
+
+        <!-- Order List -->
+
+        <div class="col-lg-8">
+
+            <section class="orders-list-card store-card"
+                     aria-labelledby="orderHistoryTitle">
+
+                <div class="orders-list-header store-section-header">
+
+                    <div>
+
+                        <span>Your purchases</span>
+
+                        <h2 id="orderHistoryTitle">Order History</h2>
+
+                    </div>
+
+                    <div class="orders-count-badge"
+                         role="status">
+
+                        <i class="bi bi-box-seam" aria-hidden="true"></i>
+
+                        <span th:text="${#lists.size(orders)}">
+                            0
+                        </span>
+
+                        <span>Orders</span>
+
+                    </div>
+
+                </div>
+
+                <div class="orders-list-body">
+
+                    <article class="order-item-card store-hover"
+                             th:each="order : ${orders}"
+                             th:aria-labelledby="'orderTitle-' + ${order.id}">
+
+                        <div class="order-item-top">
+
+                            <div class="order-number-group">
+
+                                <span class="order-icon-box">
+                                    <i class="bi bi-bag-check" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+
+                                    <span class="order-label">
+                                        Order number
+                                    </span>
+
+                                    <h3 th:id="'orderTitle-' + ${order.id}">
+                                        Order #<span th:text="${order.id}">
+                                            1001
+                                        </span>
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Dynamic Status Badge -->
+
+                            <span class="order-status-badge store-status"
+                                  role="status"
+                                  th:aria-label="'Order status: ' + ${order.status}"
+                                  th:classappend="
+                                      ${#strings.equalsIgnoreCase(order.status, 'Pending')}
+                                          ? ' status-pending' :
+                                      (${#strings.equalsIgnoreCase(order.status, 'Processing')}
+                                          ? ' status-processing' :
+                                      (${#strings.equalsIgnoreCase(order.status, 'Shipped')}
+                                          ? ' status-shipped' :
+                                      (${#strings.equalsIgnoreCase(order.status, 'Delivered')}
+                                          ? ' status-delivered' :
+                                      (${#strings.equalsIgnoreCase(order.status, 'Completed')}
+                                          ? ' status-delivered' :
+                                      (${#strings.equalsIgnoreCase(order.status, 'Cancelled')}
+                                          ? ' status-cancelled' :
+                                            ' status-default')))))">
+
+                                <i class="bi bi-circle-fill" aria-hidden="true"></i>
+
+                                <span th:text="${order.status}">
+                                    Pending
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                        <div class="order-item-divider"></div>
+
+                        <div class="order-item-details">
+
+                            <!-- Date -->
+
+                            <div class="order-detail-block">
+
+                                <span class="order-detail-icon">
+                                    <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+
+                                    <span class="order-detail-label">
+                                        Order Date
+                                    </span>
+
+                                    <time th:datetime="${#temporals.format(order.orderDate, 'yyyy-MM-dd''T''HH:mm:ss')}"
+                                          th:text="${#temporals.format(order.orderDate, 'MMMM dd, yyyy — hh:mm a')}">
+                                        July 25, 2026 — 12:10 PM
+                                    </time>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Total -->
+
+                            <div class="order-detail-block">
+
+                                <span class="order-detail-icon">
+                                    <i class="bi bi-wallet2" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+
+                                    <span class="order-detail-label">
+                                        Total Amount
+                                    </span>
+
+                                    <strong class="order-total-amount">
+
+                                        ₱<span th:text="${#numbers.formatDecimal(
+                                                order.totalAmount,
+                                                1,
+                                                'COMMA',
+                                                2,
+                                                'POINT')}">
+                                            0.00
+                                        </span>
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                            <!-- ID -->
+
+                            <div class="order-detail-block">
+
+                                <span class="order-detail-icon">
+                                    <i class="bi bi-receipt" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+
+                                    <span class="order-detail-label">
+                                        Reference
+                                    </span>
+
+                                    <strong>
+                                        ORD-<span th:text="${order.id}">
+                                            1001
+                                        </span>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="order-item-actions">
+
+                            <div class="order-action-note">
+
+                                <i class="bi bi-info-circle" aria-hidden="true"></i>
+
+                                <span>
+                                    Open this order to view its products,
+                                    delivery details, payment method, and status.
+                                </span>
+
+                            </div>
+
+                            <a th:href="@{/my-orders/{id}(id=${order.id})}"
+                               class="btn order-view-button btn-store-primary"
+                               th:aria-label="'View details for order ' + ${order.id}">
+
+                                View Details
+
+                                <i class="bi bi-arrow-right ms-2"
+                                   aria-hidden="true"></i>
+
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- Summary Panel -->
+
+        <div class="col-lg-4">
+
+            <aside class="orders-summary-card store-card"
+                aria-labelledby="ordersSummaryTitle">
+
+                <div class="orders-summary-header">
+
+                    <div>
+
+                        <span>Account overview</span>
+
+                        <h2 id="ordersSummaryTitle">Order Summary</h2>
+
+                    </div>
+
+                    <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+
+                </div>
+
+                <div class="orders-summary-body">
+
+                    <!-- Total Orders -->
+
+                    <div class="orders-stat-card"
+                         role="group"
+                         aria-label="Total orders">
+
+                        <span class="orders-stat-icon total">
+                            <i class="bi bi-box-seam" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+
+                            <span>Total Orders</span>
+
+                            <strong th:text="${#lists.size(orders)}">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Pending Orders -->
+
+                    <div class="orders-stat-card"
+                         role="group"
+                         aria-label="Pending orders">
+
+                        <span class="orders-stat-icon pending">
+                            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+
+                            <span>Pending</span>
+
+                            <strong th:text="${#lists.size(
+                                    orders.?[
+                                        #strings.equalsIgnoreCase(
+                                            status,
+                                            'Pending'
+                                        )
+                                    ]
+                                )}">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Processing Orders -->
+
+                    <div class="orders-stat-card"
+                         role="group"
+                         aria-label="Processing orders">
+
+                        <span class="orders-stat-icon processing">
+                            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+
+                            <span>Processing</span>
+
+                            <strong th:text="${#lists.size(
+                                    orders.?[
+                                        #strings.equalsIgnoreCase(
+                                            status,
+                                            'Processing'
+                                        )
+                                    ]
+                                )}">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Delivered Orders -->
+
+                    <div class="orders-stat-card"
+                         role="group"
+                         aria-label="Delivered orders">
+
+                        <span class="orders-stat-icon delivered">
+                            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+
+                            <span>Delivered</span>
+
+                            <strong th:text="${#lists.size(
+                                    orders.?[
+                                        #strings.equalsIgnoreCase(
+                                            status,
+                                            'Delivered'
+                                        )
+                                        or
+                                        #strings.equalsIgnoreCase(
+                                            status,
+                                            'Completed'
+                                        )
+                                    ]
+                                )}">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Cancelled Orders -->
+
+                    <div class="orders-stat-card"
+                         role="group"
+                         aria-label="Cancelled orders">
+
+                        <span class="orders-stat-icon cancelled">
+                            <i class="bi bi-x-circle" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+
+                            <span>Cancelled</span>
+
+                            <strong th:text="${#lists.size(
+                                    orders.?[
+                                        #strings.equalsIgnoreCase(
+                                            status,
+                                            'Cancelled'
+                                        )
+                                    ]
+                                )}">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="orders-summary-divider"></div>
+
+                    <a th:href="@{/}"
+                       class="btn orders-summary-shopping-button btn-store-primary">
+
+                        <i class="bi bi-cart-plus me-2" aria-hidden="true"></i>
+                        Shop More Products
+
+                    </a>
+
+                </div>
+
+            </aside>
+
+            <!-- Help Card -->
+
+            <section class="orders-help-card store-card"
+                     aria-labelledby="ordersHelpTitle">
+
+                <span class="orders-help-icon">
+                    <i class="bi bi-headset" aria-hidden="true"></i>
+                </span>
+
+                <div>
+
+                    <h3 id="ordersHelpTitle">Need help with an order?</h3>
+
+                    <p>
+                        Open the order details page to review all available
+                        order information.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- ================= EMPTY ORDERS ================= -->
+
+    <section th:if="${orders == null or #lists.isEmpty(orders)}"
+         class="store-empty-state"
+         role="status">
+
+    <div class="store-empty-icon"
+         aria-hidden="true">
+
+        <i class="bi bi-box-seam" aria-hidden="true"></i>
+
+    </div>
+
+    <span class="store-empty-eyebrow">
+        No purchases yet
+    </span>
+
+    <h2>You haven't placed any orders</h2>
+
+    <p>
+        When you complete your first purchase, your order history,
+        payment information, and delivery status will appear here.
+    </p>
+
+    <a th:href="@{/}"
+       class="btn store-empty-action">
+
+        <i class="bi bi-bag-plus me-2" aria-hidden="true"></i>
+        Start Shopping
+
+    </a>
+
+</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
+
 </body>
 </html>

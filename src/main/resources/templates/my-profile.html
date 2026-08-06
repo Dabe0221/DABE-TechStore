@@ -1,50 +1,538 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>My Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | DABE TechStore</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 
-<body>
-<div class="container my-5" style="max-width: 650px;">
+<body class="profile-page">
 
-    <a href="/" class="btn btn-secondary mb-4">Back to Store</a>
+<!-- ==================================================
+     NAVBAR
+     ================================================== -->
 
-    <h1>My Profile</h1>
+<nav class="navbar navbar-dark profile-navbar">
 
-    <form th:action="@{/my-profile/update}" th:object="${user}" method="post" class="card mt-4">
-        <div class="card-body">
+    <div class="container">
 
-            <input type="hidden" th:field="*{id}">
+        <a th:href="@{/}"
+           class="navbar-brand d-flex align-items-center gap-2">
 
-            <div class="mb-3">
-                <label>Name</label>
-                <input type="text" th:field="*{name}" class="form-control">
-            </div>
+            <span class="profile-brand-icon">
+                <i class="bi bi-cpu-fill" aria-hidden="true"></i>
+            </span>
 
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" th:field="*{email}" class="form-control" readonly>
-            </div>
+            <span>DABE TechStore</span>
 
-            <div class="mb-3">
-                <label>Phone</label>
-                <input type="text" th:field="*{phone}" class="form-control">
-            </div>
+        </a>
 
-            <div class="mb-3">
-                <label>Address</label>
-                <textarea th:field="*{address}" class="form-control"></textarea>
-            </div>
+        <div class="profile-navbar-actions">
 
-            <button class="btn btn-success">
-                Save Changes
-            </button>
+            <a th:href="@{/wishlist}"
+               class="profile-nav-link">
+
+                <i class="bi bi-heart" aria-hidden="true"></i>
+                Wishlist
+
+            </a>
+
+            <a th:href="@{/my-orders}"
+               class="profile-nav-link">
+
+                <i class="bi bi-box-seam" aria-hidden="true"></i>
+                My Orders
+
+            </a>
+
+            <a th:href="@{/}"
+               class="btn profile-store-button">
+
+                <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
+                Back to Store
+
+            </a>
 
         </div>
-    </form>
+
+    </div>
+
+</nav>
+
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
+
+<!-- ==================================================
+     MAIN CONTENT
+     ================================================== -->
+
+<main class="container profile-container">
+
+    <!-- ==================================================
+         HERO
+         ================================================== -->
+
+    <section class="profile-hero store-section-header">
+
+        <div class="profile-hero-content">
+
+            <span class="profile-eyebrow section-label">
+                Account Settings
+            </span>
+
+            <h1 class="page-title">My Profile</h1>
+
+            <p>
+                Manage your personal information, contact details,
+                and delivery address.
+            </p>
+
+        </div>
+
+        <div class="profile-hero-icon">
+            <i class="bi bi-person-circle" aria-hidden="true"></i>
+        </div>
+
+        <div th:if="${successMessage}"
+     class="alert alert-success profile-success-alert"
+     role="status">
+
+    <i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i>
+
+    <span th:text="${successMessage}">
+        Your profile was updated successfully.
+    </span>
 
 </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         PROFILE GRID
+         ================================================== -->
+
+    <div class="row g-4">
+
+        <!-- ==================================================
+             LEFT SIDEBAR
+             ================================================== -->
+
+        <div class="col-lg-4">
+
+            <aside class="profile-summary-card store-card" aria-labelledby="profileSummaryName">
+
+                <div class="profile-avatar">
+
+                    <span th:text="${user != null
+                            and user.name != null
+                            and !#strings.isEmpty(user.name)
+                            ? #strings.substring(user.name, 0, 1)
+                            : 'U'}">
+
+                        U
+
+                    </span>
+
+                </div>
+
+                <h2 id="profileSummaryName" th:text="${user != null
+                        and user.name != null
+                        and !#strings.isEmpty(user.name)
+                        ? user.name
+                        : 'Customer'}">
+
+                    Customer
+
+                </h2>
+
+                <p th:text="${user != null
+                        and user.email != null
+                        ? user.email
+                        : 'No email available'}">
+
+                    customer@example.com
+
+                </p>
+
+                <span class="profile-role-badge">
+
+                    <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+                    Customer Account
+
+                </span>
+
+                <div class="profile-summary-divider"></div>
+
+                <div class="profile-account-info">
+
+                    <div class="profile-account-row">
+
+                        <span class="profile-account-icon">
+                            <i class="bi bi-envelope" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+                            <small>Email Address</small>
+
+                            <strong th:text="${user != null
+                                    and user.email != null
+                                    ? user.email
+                                    : 'Not provided'}">
+
+                                Not provided
+
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="profile-account-row">
+
+                        <span class="profile-account-icon">
+                            <i class="bi bi-telephone" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+                            <small>Phone Number</small>
+
+                            <strong th:text="${user != null
+                                    and user.phone != null
+                                    and !#strings.isEmpty(user.phone)
+                                    ? user.phone
+                                    : 'Not provided'}">
+
+                                Not provided
+
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="profile-account-row">
+
+                        <span class="profile-account-icon">
+                            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+                            <small>Delivery Address</small>
+
+                            <strong th:text="${user != null
+                                    and user.address != null
+                                    and !#strings.isEmpty(user.address)
+                                    ? user.address
+                                    : 'Not provided'}">
+
+                                Not provided
+
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="profile-summary-actions">
+
+                    <a th:href="@{/my-orders}"
+                       class="btn profile-summary-link btn-store-secondary">
+
+                        <i class="bi bi-box-seam me-2" aria-hidden="true"></i>
+                        View My Orders
+
+                    </a>
+
+                    <a th:href="@{/wishlist}"
+                       class="btn profile-summary-link btn-store-secondary">
+
+                        <i class="bi bi-heart me-2" aria-hidden="true"></i>
+                        View Wishlist
+
+                    </a>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+        <!-- ==================================================
+             PROFILE FORM
+             ================================================== -->
+
+        <div class="col-lg-8">
+
+            <form th:action="@{/my-profile/update}"
+                  th:object="${user}"
+                  method="post"
+                  class="profile-form-card store-card"
+                  data-loading-form>
+
+                <input type="hidden"
+                       th:field="*{id}">
+
+                <!-- Form header -->
+
+                <div class="profile-form-header">
+
+                    <div>
+
+                        <span>Personal Information</span>
+
+                        <h2>Edit Profile</h2>
+
+                        <p>
+                            Keep your contact and delivery details accurate.
+                        </p>
+
+                    </div>
+
+                    <div class="profile-form-header-icon">
+                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                    </div>
+
+                </div>
+
+                <!-- Form body -->
+
+                <div class="profile-form-body">
+
+                    <div class="row g-4">
+
+                        <!-- Name -->
+
+                        <div class="col-12">
+
+                            <label for="profileName"
+                                   class="profile-form-label">
+
+                                Full Name
+
+                                <span class="required-mark">*</span>
+
+                            </label>
+
+                            <div class="profile-input-group">
+
+                                <span class="profile-input-icon">
+                                    <i class="bi bi-person" aria-hidden="true"></i>
+                                </span>
+
+                                <input id="profileName"
+                                       type="text"
+                                       th:field="*{name}"
+                                       class="form-control profile-form-control store-input"
+                                       placeholder="Enter your full name"
+                                       autocomplete="name"
+                                       required>
+
+                            </div>
+
+                            <small class="profile-field-help">
+                                This name may be used for your orders and deliveries.
+                            </small>
+
+                        </div>
+
+                        <!-- Email -->
+
+                        <div class="col-md-6">
+
+                            <label for="profileEmail"
+                                   class="profile-form-label">
+
+                                Email Address
+
+                            </label>
+
+                            <div class="profile-input-group readonly-field">
+
+                                <span class="profile-input-icon">
+                                    <i class="bi bi-envelope" aria-hidden="true"></i>
+                                </span>
+
+                                <input id="profileEmail"
+                                       type="email"
+                                       th:field="*{email}"
+                                       class="form-control profile-form-control store-input"
+                                       readonly
+                                       aria-describedby="profileEmailHelp">
+
+                                <span class="profile-lock-icon"
+                                      title="Email cannot be changed">
+
+                                    <i class="bi bi-lock-fill" aria-hidden="true"></i>
+
+                                </span>
+
+                            </div>
+
+                            <small  id="profileEmailHelp"
+                                    class="profile-field-help">
+                                Your email is used to identify your account.
+                            </small>
+
+                        </div>
+
+                        <!-- Phone -->
+
+                        <div class="col-md-6">
+
+                            <label for="profilePhone"
+                                   class="profile-form-label">
+
+                                Phone Number
+
+                            </label>
+
+                            <div class="profile-input-group">
+
+                                <span class="profile-input-icon">
+                                    <i class="bi bi-telephone" aria-hidden="true"></i>
+                                </span>
+
+                                <input id="profilePhone"
+                                       type="tel"
+                                       th:field="*{phone}"
+                                       class="form-control profile-form-control store-input"
+                                       placeholder="Enter your phone number"
+                                       autocomplete="tel"
+                                       aria-describedby="profilePhoneHelp">
+
+                            </div>
+
+                            <small  id="profilePhoneHelp"
+                                    class="profile-field-help">
+                                Used for delivery and order-related communication.
+                            </small>
+
+                        </div>
+
+                        <!-- Address -->
+
+                        <div class="col-12">
+
+                            <label for="profileAddress"
+                                   class="profile-form-label">
+
+                                Delivery Address
+
+                            </label>
+
+                            <div class="profile-input-group profile-textarea-group">
+
+                                <span class="profile-input-icon">
+                                    <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                                </span>
+
+                                <textarea id="profileAddress"
+                                          th:field="*{address}"
+                                          class="form-control profile-form-control profile-address-field store-input"
+                                          rows="5"
+                                          placeholder="Enter your complete delivery address"
+                                          autocomplete="street-address"
+                                          aria-describedby="profileAddressHelp"></textarea>
+
+                            </div>
+
+                            <small  id="profileAddressHelp"
+                                    class="profile-field-help">
+                                Include your house number, street, barangay,
+                                city or municipality, and province.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Form footer -->
+
+                <div class="profile-form-footer">
+
+                    <a th:href="@{/}"
+                       class="btn profile-cancel-button btn-store-secondary">
+
+                        <i class="bi bi-x-lg me-2" aria-hidden="true"></i>
+                        Cancel
+
+                    </a>
+
+                     <button type="submit"
+                        class="btn profile-save-btn btn-store-primary"
+                           data-loading-button
+                            data-loading-text="Saving Changes...">
+
+                        <i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i>
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            <!-- ==================================================
+                 SECURITY INFORMATION
+                 ================================================== -->
+
+            <section class="profile-security-card store-card" aria-labelledby="profileSecurityTitle">
+
+                <div class="profile-security-icon">
+
+                    <i class="bi bi-shield-lock" aria-hidden="true"></i>
+
+                </div>
+
+                <div class="profile-security-content">
+
+                    <h3 id="profileSecurityTitle">Account Security</h3>
+
+                    <p>
+                        Your email address cannot be changed from this page.
+                        Your account information is only available after
+                        authentication.
+                    </p>
+
+                </div>
+
+                <span class="profile-security-status">
+
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    Protected
+
+                </span>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
+
 </body>
 </html>

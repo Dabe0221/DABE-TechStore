@@ -14,6 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+
 
 
 
@@ -57,21 +60,35 @@ public class CustomerController {
         return "my-profile";
     }
 
-    @PostMapping("/my-profile/update")
-public String updateProfile(@ModelAttribute User formUser,
-                            Authentication authentication) {
+   @PostMapping("/my-profile/update")
+public String updateProfile(
+        @ModelAttribute User formUser,
+        Authentication authentication,
+        RedirectAttributes redirectAttributes) {
 
     String email = authentication.getName();
 
     User user = userRepository.findByEmail(email).orElse(null);
 
-    if (user != null) {
-        user.setName(formUser.getName());
-        user.setPhone(formUser.getPhone());
-        user.setAddress(formUser.getAddress());
+    if (user == null) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "Your profile could not be found."
+        );
 
-        userRepository.save(user);
+        return "redirect:/my-profile";
     }
+
+    user.setName(formUser.getName());
+    user.setPhone(formUser.getPhone());
+    user.setAddress(formUser.getAddress());
+
+    userRepository.save(user);
+
+    redirectAttributes.addFlashAttribute(
+            "successMessage",
+            "Your profile was updated successfully."
+    );
 
     return "redirect:/my-profile";
 }
@@ -93,35 +110,70 @@ public String myOrderDetails(@PathVariable @NonNull Long id,
     return "my-order-details";
 
 }
-           @PostMapping("/wishlist/add/{id}")
-public String addToWishlist(@PathVariable Long id,
-                            Authentication authentication) {
+@PostMapping("/wishlist/add/{id}")
+public String addToWishlist(
+        @PathVariable Long id,
+        Authentication authentication,
+        RedirectAttributes redirectAttributes) {
 
     String email = authentication.getName();
 
     User user = userRepository.findByEmail(email).orElse(null);
-
     Product product = productService.getProductById(id);
 
-    if (user != null && product != null) {
-        wishlistService.addToWishlist(user, product);
+    if (user == null) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "Please sign in before adding products to your wishlist."
+        );
+
+        return "redirect:/login";
     }
+
+    if (product == null) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "The selected product could not be found."
+        );
+
+        return "redirect:/";
+    }
+
+    wishlistService.addToWishlist(user, product);
+
+    redirectAttributes.addFlashAttribute(
+            "successMessage",
+            product.getName() + " was added to your wishlist."
+    );
 
     return "redirect:/product/" + id;
-}          
-    @PostMapping("/wishlist/remove/{id}")
-public String removeFromWishlist(@PathVariable Long id,
-                                 Authentication authentication) {
+}     
+ @PostMapping("/wishlist/remove/{id}")
+public String removeFromWishlist(
+        @PathVariable Long id,
+        Authentication authentication,
+        RedirectAttributes redirectAttributes) {
 
     String email = authentication.getName();
 
     User user = userRepository.findByEmail(email).orElse(null);
-
     Product product = productService.getProductById(id);
 
-    if (user != null && product != null) {
-        wishlistService.removeFromWishlist(user, product);
+    if (user == null || product == null) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                "The wishlist item could not be removed."
+        );
+
+        return "redirect:/wishlist";
     }
+
+    wishlistService.removeFromWishlist(user, product);
+
+    redirectAttributes.addFlashAttribute(
+            "successMessage",
+            product.getName() + " was removed from your wishlist."
+    );
 
     return "redirect:/wishlist";
 }

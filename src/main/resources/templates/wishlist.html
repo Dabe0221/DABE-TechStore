@@ -31,7 +31,7 @@
            class="navbar-brand d-flex align-items-center gap-2">
 
             <span class="wishlist-brand-icon">
-                <i class="bi bi-cpu-fill"></i>
+                <i class="bi bi-cpu-fill" aria-hidden="true"></i>
             </span>
 
             <span>DABE TechStore</span>
@@ -41,7 +41,7 @@
         <a th:href="@{/}"
            class="btn btn-outline-light">
 
-            <i class="bi bi-arrow-left me-2"></i>
+            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
             Continue Shopping
 
         </a>
@@ -49,7 +49,7 @@
     </div>
 
 </nav>
-
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
 <!-- ================= MAIN CONTENT ================= -->
 
 <main class="container wishlist-container">
@@ -60,13 +60,13 @@
 
         <div>
 
-            <span class="wishlist-page-label">
+            <span class="wishlist-page-label section-label">
                 Products saved for later
             </span>
 
-            <h1 class="wishlist-page-title">
+            <h1 class="wishlist-page-title page-title">
 
-                <i class="bi bi-heart-fill me-2"></i>
+                <i class="bi bi-heart-fill me-2" aria-hidden="true"></i>
                 My Wishlist
 
             </h1>
@@ -79,9 +79,10 @@
         </div>
 
         <div class="wishlist-item-count"
-             th:if="${wishlistItems != null}">
+             th:if="${wishlistItems != null}"
+             role="status">
 
-            <i class="bi bi-heart me-2"></i>
+            <i class="bi bi-heart me-2" aria-hidden="true"></i>
 
             <span th:text="${#lists.size(wishlistItems)}">
                 0
@@ -99,30 +100,37 @@
 
     <!-- ================= EMPTY WISHLIST ================= -->
 
-    <section th:if="${wishlistItems == null
-                    or #lists.isEmpty(wishlistItems)}"
-             class="empty-wishlist-section">
+  <section th:if="${wishlistItems == null
+                or #lists.isEmpty(wishlistItems)}"
+         class="store-empty-state">
 
-        <div class="empty-wishlist-icon">
-            <i class="bi bi-heart"></i>
-        </div>
+    <div class="store-empty-icon"
+         aria-hidden="true">
 
-        <h2>Your wishlist is empty</h2>
+        <i class="bi bi-heart"></i>
 
-        <p>
-            Save products you love and return to them anytime.
-            Start browsing the store to build your wishlist.
-        </p>
+    </div>
 
-        <a th:href="@{/}"
-           class="btn btn-warning btn-lg empty-wishlist-button">
+    <span class="store-empty-eyebrow">
+        Save your favorites
+    </span>
 
-            <i class="bi bi-bag-plus me-2"></i>
-            Browse Products
+    <h2>Your wishlist is empty</h2>
 
-        </a>
+    <p>
+        Save products you love so you can easily find them later.
+        Your favorite items will appear here.
+    </p>
 
-    </section>
+    <a th:href="@{/}"
+       class="btn store-empty-action">
+
+        <i class="bi bi-shop me-2" aria-hidden="true"></i>
+        Explore Products
+
+    </a>
+
+</section>
 
     <!-- ================= WISHLIST CONTENT ================= -->
 
@@ -132,11 +140,11 @@
 
         <!-- Product Area -->
 
-        <div class="col-lg-9">
+       <div class="col-lg-8">
 
-            <section class="wishlist-products-section">
+            <section class="wishlist-products-section store-card">
 
-                <div class="wishlist-section-header">
+                <div class="wishlist-section-header store-section-header">
 
                     <div>
 
@@ -149,35 +157,37 @@
 
                     </div>
 
-                    <i class="bi bi-heart-fill wishlist-section-icon"></i>
+                    <i class="bi bi-heart-fill wishlist-section-icon" aria-hidden="true"></i>
 
                 </div>
 
                 <div class="row g-4 wishlist-product-grid">
 
-                    <div class="col-xl-4 col-md-6"
+                    <div class="col-xl-6 col-md-6"
                          th:each="item : ${wishlistItems}">
 
-                        <article class="wishlist-product-card">
+                        <article class="wishlist-product-card store-hover">
 
                             <!-- Product Image -->
 
                             <div class="wishlist-product-image-area">
 
                                 <span class="wishlist-stock-badge in-stock"
+                                      role="status"
                                       th:if="${item.product.stock != null
                                               and item.product.stock > 0}">
 
-                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>
                                     In Stock
 
                                 </span>
 
                                 <span class="wishlist-stock-badge out-of-stock"
+                                      role="status"
                                       th:if="${item.product.stock == null
                                               or item.product.stock <= 0}">
 
-                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                    <i class="bi bi-x-circle-fill me-1" aria-hidden="true"></i>
                                     Sold Out
 
                                 </span>
@@ -195,7 +205,7 @@
                                                    and !#strings.isEmpty(item.product.imageUrl)}"
                                          class="wishlist-product-placeholder">
 
-                                        <i class="bi bi-image"></i>
+                                        <i class="bi bi-image" aria-hidden="true"></i>
 
                                     </div>
 
@@ -230,17 +240,19 @@
 
                                 <div class="wishlist-product-rating">
 
-                                    <div class="wishlist-rating-stars">
+                                    <div class="wishlist-rating-stars" aria-hidden="true">
 
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star"></i>
+                                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                        <i class="bi bi-star" aria-hidden="true"></i>
 
                                     </div>
 
-                                    <span>View reviews</span>
+                                    <span class="visually-hidden">
+                                            Rated 4 out of 5 stars
+                                            </span>
 
                                 </div>
 
@@ -260,9 +272,10 @@
                                 <div class="wishlist-product-actions">
 
                                     <a th:href="@{/product/{id}(id=${item.product.id})}"
-                                       class="btn wishlist-view-button">
+                                       class="btn wishlist-view-button btn-store-secondary"
+                                        th:aria-label="'View details for ' + ${item.product.name}">
 
-                                        <i class="bi bi-eye me-2"></i>
+                                        <i class="bi bi-eye me-2" aria-hidden="true"></i>
                                         View Product
 
                                     </a>
@@ -271,16 +284,19 @@
                                                  and item.product.stock > 0}"
                                           th:action="@{/cart/add/{id}(id=${item.product.id})}"
                                           method="post"
-                                          class="wishlist-cart-form">
+                                          class="wishlist-cart-form"
+                                          data-loading-form>
 
                                         <input type="hidden"
                                                name="quantity"
                                                value="1">
 
                                         <button type="submit"
-                                                class="btn wishlist-cart-button">
+                                                class="btn wishlist-cart-button btn-store-primary"
+                                                data-loading-button
+                                                data-loading-text="Adding...">
 
-                                            <i class="bi bi-cart-plus me-2"></i>
+                                            <i class="bi bi-cart-plus me-2" aria-hidden="true"></i>
                                             Add to Cart
 
                                         </button>
@@ -291,21 +307,25 @@
                                                    or item.product.stock <= 0}"
                                             type="button"
                                             class="btn wishlist-sold-out-button"
-                                            disabled>
+                                            disabled
+                                            aria-disabled="true">
 
-                                        <i class="bi bi-x-circle me-2"></i>
+                                        <i class="bi bi-x-circle me-2" aria-hidden="true"></i>
                                         Sold Out
 
                                     </button>
 
                                     <form th:action="@{/wishlist/remove/{id}(id=${item.product.id})}"
-                                          method="post">
+                                          method="post"
+                                           data-loading-form>
 
                                         <button type="submit"
-                                                class="btn wishlist-remove-button">
+                                                class="btn wishlist-remove-button btn-store-danger"
+                                                 data-loading-button
+                                                   data-loading-text="Removing...">
 
-                                            <i class="bi bi-trash3 me-2"></i>
-                                            Remove
+                                            <i class="bi bi-heartbreak" aria-hidden="true"></i>
+                                           <span> Remove </span>
 
                                         </button>
 
@@ -327,9 +347,9 @@
 
         <!-- ================= SUMMARY ================= -->
 
-        <div class="col-lg-3">
+        <div class="col-lg-4">
 
-            <aside class="wishlist-summary-card">
+            <aside class="wishlist-summary-card store-card" aria-labelledby="wishlistSummaryTitle">
 
                 <div class="wishlist-summary-header">
 
@@ -337,11 +357,11 @@
 
                         <span>Saved collection</span>
 
-                        <h2>Wishlist Summary</h2>
+                        <h2 id="wishlistSummaryTitle">Wishlist Summary</h2>
 
                     </div>
 
-                    <i class="bi bi-heart-fill"></i>
+                    <i class="bi bi-heart-fill" aria-hidden="true"></i>
 
                 </div>
 
@@ -359,7 +379,7 @@
 
                     <div class="wishlist-summary-note">
 
-                        <i class="bi bi-info-circle"></i>
+                        <i class="bi bi-info-circle" aria-hidden="true"></i>
 
                         <p>
                             Product availability may change. Add available
@@ -369,17 +389,17 @@
                     </div>
 
                     <a th:href="@{/}"
-                       class="btn btn-warning wishlist-shop-button">
+                       class="btn wishlist-shop-button btn-store-primary">
 
-                        <i class="bi bi-bag-plus me-2"></i>
+                        <i class="bi bi-bag-plus me-2" aria-hidden="true"></i>
                         Continue Shopping
 
                     </a>
 
                     <a th:href="@{/cart}"
-                       class="btn wishlist-cart-link-button">
+                       class="btn wishlist-cart-link-button btn-store-secondary">
 
-                        <i class="bi bi-cart3 me-2"></i>
+                        <i class="bi bi-cart3 me-2" aria-hidden="true"></i>
                         View Shopping Cart
 
                     </a>
@@ -388,11 +408,11 @@
 
             </aside>
 
-            <div class="wishlist-benefits-card">
+            <div class="wishlist-benefits-card store-card">
 
                 <div class="wishlist-benefit">
 
-                    <i class="bi bi-heart"></i>
+                    <i class="bi bi-heart" aria-hidden="true"></i>
 
                     <div>
 
@@ -408,7 +428,7 @@
 
                 <div class="wishlist-benefit">
 
-                    <i class="bi bi-cart-check"></i>
+                    <i class="bi bi-cart-check" aria-hidden="true"></i>
 
                     <div>
 
@@ -424,7 +444,7 @@
 
                 <div class="wishlist-benefit">
 
-                    <i class="bi bi-shield-check"></i>
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
 
                     <div>
 
@@ -449,5 +469,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
 </script>
 
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
 </body>
 </html>

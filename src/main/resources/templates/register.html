@@ -1,44 +1,402 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | DABE TechStore</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
 
-<body>
-<div class="container my-5" style="max-width: 500px;">
+<body class="register-page">
 
-    <h1 class="mb-4">Register</h1>
+<!-- ================= NAVBAR ================= -->
 
-    <form method="post" action="/register">
+<nav class="navbar navbar-dark register-navbar">
 
-        <div class="mb-3">
-            <label>Full Name</label>
-            <input type="text" name="name" class="form-control" required>
+    <div class="container">
+
+        <a th:href="@{/}"
+           class="navbar-brand d-flex align-items-center gap-2">
+
+            <span class="register-brand-icon">
+                <i class="bi bi-cpu-fill"></i>
+            </span>
+
+            <span>DABE TechStore</span>
+
+        </a>
+
+        <a th:href="@{/login}"
+           class="btn register-login-button">
+
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Login
+
+        </a>
+
+    </div>
+
+</nav>
+
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
+
+<!-- ================= MAIN ================= -->
+
+<main class="register-container">
+
+    <section class="register-layout">
+
+        <!-- LEFT PANEL -->
+
+        <div class="register-promo-panel">
+
+            <div class="register-content">
+
+                <span class="register-eyebrow">
+                    Join Today
+                </span>
+
+                <h1>
+                    Create your DABE TechStore account
+                </h1>
+
+                <p>
+
+                    Register to start shopping, save your wishlist,
+                    track orders, and manage your account from one place.
+
+                </p>
+
+                <div class="register-benefits">
+
+                    <div class="register-benefit">
+
+                        <span><i class="bi bi-cart-check"></i></span>
+
+                        <div>
+
+                            <strong>Fast Checkout</strong>
+
+                            <small>
+                                Save your profile for quicker purchases.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="register-benefit">
+
+                        <span><i class="bi bi-heart"></i></span>
+
+                        <div>
+
+                            <strong>Wishlist</strong>
+
+                            <small>
+                                Save products for future purchases.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="register-benefit">
+
+                        <span><i class="bi bi-truck"></i></span>
+
+                        <div>
+
+                            <strong>Track Orders</strong>
+
+                            <small>
+                                View your complete purchase history.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" name="email" class="form-control" required>
-        </div>
+        <!-- RIGHT PANEL -->
 
-        <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
+        <div class="register-form-panel">
 
-        <button class="btn btn-primary w-100">
-            Register
+            <div class="register-card">
+
+                <div class="register-card-header">
+
+                    <div class="register-icon">
+
+                        <i class="bi bi-person-plus-fill"></i>
+
+                    </div>
+
+                    <span>Create Account</span>
+
+                    <h2>Welcome!</h2>
+
+                    <p>
+
+                        Fill in the information below to create your account.
+
+                    </p>
+
+                </div>
+
+                <form method="post"
+                       th:action="@{/register}"
+                       class="register-form"
+                       data-loading-form>
+
+                    <!-- NAME -->
+
+                    <div class="register-field">
+
+                        <label for="registerName">Full Name</label>
+
+                        <div class="register-input-group">
+
+                            <span class="register-input-icon">
+                                <i class="bi bi-person"></i>
+                            </span>
+
+                            <input   
+                                    id="registerName"
+                                    type="text"
+                                    name="name"
+                                    class="form-control register-control"
+                                    placeholder="Enter your full name"
+                                    autocomplete="name"
+                                    required>
+
+                        </div>
+
+                    </div>
+
+                    <!-- EMAIL -->
+
+                    <div class="register-field">
+
+                        <label for="registerEmail">Email Address</label>
+
+                        <div class="register-input-group">
+
+                            <span class="register-input-icon">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+
+                            <input   
+                                    id="registerEmail"
+                                    type="email"
+                                    name="email"
+                                    class="form-control register-control"
+                                    placeholder="Enter your email"
+                                    autocomplete="email"
+                                    required>
+
+                        </div>
+
+                    </div>
+
+                   <!-- PASSWORD -->
+
+<div class="register-field">
+
+    <label for="registerPassword">
+        Password
+    </label>
+
+    <div class="register-input-group">
+
+        <span class="register-input-icon">
+            <i class="bi bi-lock"></i>
+        </span>
+
+        <input
+                id="registerPassword"
+                type="password"
+                name="password"
+                class="form-control register-control"
+                placeholder="Create a password"
+                minlength="8"
+                autocomplete="new-password"
+                required>
+
+        <button type="button"
+                id="toggleRegisterPassword"
+                class="register-password-toggle"
+                aria-label="Show password">
+
+            <i class="bi bi-eye"></i>
+
         </button>
 
-    </form>
+    </div>
 
-    <p class="mt-3">
-        Already have an account?
-        <a href="/login">Login</a>
-    </p>
+    <!-- PASSWORD STRENGTH -->
+
+    <div class="password-strength">
+
+        <div class="password-strength-bar">
+            <div id="passwordStrengthFill"></div>
+        </div>
+
+        <small id="passwordStrengthText"
+               class="text-muted">
+            Password strength
+        </small>
+
+    </div>
 
 </div>
+
+
+<!-- CONFIRM PASSWORD -->
+
+<div class="register-field">
+
+    <label for="confirmPassword">
+        Confirm Password
+    </label>
+
+    <div class="register-input-group">
+
+        <span class="register-input-icon">
+            <i class="bi bi-shield-lock"></i>
+        </span>
+
+        <input
+                id="confirmPassword"
+                type="password"
+                name="confirmPassword"
+                class="form-control register-control"
+                placeholder="Re-enter your password"
+                minlength="8"
+                autocomplete="new-password"
+                required>
+
+        <button type="button"
+                id="toggleConfirmPassword"
+                class="register-password-toggle"
+                aria-label="Show confirm password">
+
+            <i class="bi bi-eye"></i>
+
+        </button>
+
+    </div>
+
+    <div id="passwordMatchMessage"
+         class="small mt-2"
+         aria-live="polite">
+    </div>
+
+</div>
+
+                    <button type="submit"
+                         class="btn register-submit-btn"
+                         data-loading-button
+                        data-loading-text="Creating Account...">
+
+                        <i class="bi bi-person-check me-2"></i>
+
+                        Create Account
+
+                    </button>
+
+                </form>
+
+                <div class="register-divider">
+
+                    <span>Already have an account?</span>
+
+                </div>
+
+                <a th:href="@{/login}"
+                        class="btn register-secondary-button">
+
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                    Login Instead
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    function setupPasswordToggle(buttonId, inputId) {
+
+        const button = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+
+        if (!button || !input) {
+            return;
+        }
+
+        button.addEventListener("click", () => {
+
+            const isHidden = input.type === "password";
+
+            input.type = isHidden ? "text" : "password";
+
+            const icon = button.querySelector("i");
+
+            icon.classList.toggle("bi-eye", !isHidden);
+            icon.classList.toggle("bi-eye-slash", isHidden);
+
+            button.setAttribute(
+                "aria-label",
+                isHidden ? "Hide password" : "Show password"
+            );
+        });
+    }
+
+    setupPasswordToggle(
+        "toggleRegisterPassword",
+        "registerPassword"
+    );
+
+    setupPasswordToggle(
+        "toggleConfirmPassword",
+        "confirmPassword"
+    );
+});
+</script>
+
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/register-validation.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
+
+
 </body>
 </html>

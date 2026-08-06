@@ -10,15 +10,13 @@
 
     <title>Secure Checkout | DABE TechStore</title>
 
-    <!-- Bootstrap -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
           rel="stylesheet">
 
-    <!-- Main Stylesheet -->
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 </head>
@@ -35,7 +33,7 @@
            class="navbar-brand d-flex align-items-center gap-2">
 
             <span class="checkout-brand-icon">
-                <i class="bi bi-cpu-fill"></i>
+                <i class="bi bi-cpu-fill" aria-hidden="true"></i>
             </span>
 
             <span>DABE TechStore</span>
@@ -44,7 +42,7 @@
 
         <div class="checkout-navbar-security">
 
-            <i class="bi bi-shield-lock-fill"></i>
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
 
             <span>Secure Checkout</span>
 
@@ -54,23 +52,25 @@
 
 </nav>
 
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
+
 <!-- ================= MAIN CHECKOUT ================= -->
 
 <main class="container checkout-container">
 
     <!-- Page Header -->
 
-    <div class="checkout-page-header">
+    <div class="checkout-page-header store-section-header">
 
         <div>
 
-            <span class="checkout-page-label">
+            <span class="checkout-page-label section-label">
                 Complete your purchase
             </span>
 
-            <h1 class="checkout-page-title">
+            <h1 class="checkout-page-title page-title">
 
-                <i class="bi bi-bag-check me-2"></i>
+                <i class="bi bi-bag-check me-2" aria-hidden="true"></i>
                 Secure Checkout
 
             </h1>
@@ -83,9 +83,9 @@
         </div>
 
         <a th:href="@{/cart}"
-           class="btn checkout-back-button">
+           class="btn checkout-back-button btn-store-secondary">
 
-            <i class="bi bi-arrow-left me-2"></i>
+            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
             Back to Cart
 
         </a>
@@ -95,9 +95,10 @@
     <!-- Optional Error Message -->
 
     <div th:if="${error}"
-         class="alert alert-danger checkout-alert">
+         class="alert alert-danger checkout-alert"
+         role="alert">
 
-        <i class="bi bi-exclamation-circle-fill me-2"></i>
+        <i class="bi bi-exclamation-circle-fill me-2" aria-hidden="true"></i>
 
         <span th:text="${error}">
             Unable to place your order.
@@ -108,7 +109,8 @@
     <!-- Optional Success or Information Message -->
 
     <div th:if="${message}"
-         class="alert alert-info checkout-alert">
+         class="alert alert-info checkout-alert"
+         role="status">
 
         <i class="bi bi-info-circle-fill me-2"></i>
 
@@ -121,9 +123,10 @@
     <!-- ================= CHECKOUT FORM ================= -->
 
     <form th:action="@{/checkout/place-order}"
-          th:object="${order}"
-          method="post"
-          class="checkout-form">
+    th:object="${order}"
+    method="post"
+    class="checkout-form"
+    data-loading-form>
 
         <div class="row g-4">
 
@@ -133,14 +136,15 @@
 
                 <!-- Delivery Information -->
 
-                <section class="checkout-section-card">
+                <section class="checkout-section-card store-card"
+                         aria-labelledby="deliveryInformationTitle">
 
                     <div class="checkout-section-header">
 
                         <div class="checkout-section-heading">
 
                             <span class="checkout-section-icon">
-                                <i class="bi bi-truck"></i>
+                                <i class="bi bi-truck" aria-hidden="true"></i>
                             </span>
 
                             <div>
@@ -149,7 +153,7 @@
                                     Step 1
                                 </span>
 
-                                <h2>Delivery Information</h2>
+                                <h2 id="deliveryInformationTitle">Delivery Information</h2>
 
                                 <p>
                                     Provide the information needed to process
@@ -182,13 +186,13 @@
                                 <div class="checkout-input-group">
 
                                     <span class="checkout-input-icon">
-                                        <i class="bi bi-person"></i>
+                                        <i class="bi bi-person" aria-hidden="true"></i>
                                     </span>
 
                                     <input type="text"
                                            id="customerName"
                                            th:field="*{customerName}"
-                                           class="form-control checkout-form-control"
+                                           class="form-control checkout-form-control store-input"
                                            placeholder="Enter your full name"
                                            autocomplete="name"
                                            required>
@@ -196,9 +200,10 @@
                                 </div>
 
                                 <div class="checkout-field-error"
+                                     role="alert"
                                      th:if="${#fields.hasErrors('customerName')}">
 
-                                    <i class="bi bi-exclamation-circle"></i>
+                                    <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
 
                                     <span th:errors="*{customerName}">
                                         Invalid customer name
@@ -222,19 +227,19 @@
                                 <div class="checkout-input-group">
 
                                     <span class="checkout-input-icon">
-                                        <i class="bi bi-envelope"></i>
+                                        <i class="bi bi-envelope" aria-hidden="true"></i>
                                     </span>
 
                                     <input type="email"
                                            id="checkoutEmail"
                                            th:value="${#authentication.name}"
-                                           class="form-control checkout-form-control"
+                                           class="form-control checkout-form-control store-input"
                                            readonly>
 
                                     <span class="checkout-verified-icon"
                                           title="Authenticated account">
 
-                                        <i class="bi bi-patch-check-fill"></i>
+                                        <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
 
                                     </span>
 
@@ -263,13 +268,13 @@
                                 <div class="checkout-input-group">
 
                                     <span class="checkout-input-icon">
-                                        <i class="bi bi-telephone"></i>
+                                        <i class="bi bi-telephone" aria-hidden="true"></i>
                                     </span>
 
                                     <input type="tel"
                                            id="phone"
                                            th:field="*{phone}"
-                                           class="form-control checkout-form-control"
+                                           class="form-control checkout-form-control store-input"
                                            placeholder="Enter your phone number"
                                            autocomplete="tel"
                                            required>
@@ -277,9 +282,10 @@
                                 </div>
 
                                 <div class="checkout-field-error"
+                                     role="alert"
                                      th:if="${#fields.hasErrors('phone')}">
 
-                                    <i class="bi bi-exclamation-circle"></i>
+                                    <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
 
                                     <span th:errors="*{phone}">
                                         Invalid phone number
@@ -295,7 +301,7 @@
 
                                 <div class="checkout-delivery-note">
 
-                                    <i class="bi bi-info-circle"></i>
+                                    <i class="bi bi-info-circle" aria-hidden="true"></i>
 
                                     <div>
 
@@ -329,12 +335,12 @@
                                 <div class="checkout-textarea-group">
 
                                     <span class="checkout-textarea-icon">
-                                        <i class="bi bi-geo-alt"></i>
+                                        <i class="bi bi-geo-alt" aria-hidden="true"></i>
                                     </span>
 
                                     <textarea id="address"
                                               th:field="*{address}"
-                                              class="form-control checkout-form-control checkout-address-field"
+                                              class="form-control checkout-form-control checkout-address-field store-input"
                                               rows="4"
                                               placeholder="House number, street, barangay, city or municipality, province and postal code"
                                               autocomplete="street-address"
@@ -343,9 +349,10 @@
                                 </div>
 
                                 <div class="checkout-field-error"
+                                     role="alert"
                                      th:if="${#fields.hasErrors('address')}">
 
-                                    <i class="bi bi-exclamation-circle"></i>
+                                    <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
 
                                     <span th:errors="*{address}">
                                         Invalid address
@@ -363,14 +370,15 @@
 
                 <!-- Payment Method -->
 
-                <section class="checkout-section-card checkout-payment-section">
+               <section class="checkout-section-card checkout-payment-section store-card"
+                         aria-labelledby="paymentMethodTitle">
 
                     <div class="checkout-section-header">
 
                         <div class="checkout-section-heading">
 
                             <span class="checkout-section-icon payment">
-                                <i class="bi bi-credit-card"></i>
+                                <i class="bi bi-credit-card" aria-hidden="true"></i>
                             </span>
 
                             <div>
@@ -379,7 +387,7 @@
                                     Step 2
                                 </span>
 
-                                <h2>Payment Method</h2>
+                                <h2 id="paymentMethodTitle">Payment Method</h2>
 
                                 <p>
                                     Select how you would like to pay for your
@@ -394,25 +402,32 @@
 
                     <div class="checkout-section-body">
 
-                        <div class="checkout-payment-grid">
+                        <div class="checkout-payment-grid"
+                             role="radiogroup"
+                             aria-labelledby="paymentMethodTitle">
 
                             <!-- Cash on Delivery -->
 
-                            <label class="checkout-payment-option">
+                           <label class="checkout-payment-option"
+                                     for="paymentCod">
 
-                                <input type="radio"
+                                <input
+                                       id="paymentCod"                               
+                                       type="radio"
                                        name="paymentMethod"
                                        value="Cash on Delivery"
                                        required>
 
+                                       
+
                                 <span class="checkout-payment-card">
 
                                     <span class="checkout-payment-select">
-                                        <i class="bi bi-check"></i>
+                                        <i class="bi bi-check" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-icon cash">
-                                        <i class="bi bi-cash-stack"></i>
+                                        <i class="bi bi-cash-stack" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-content">
@@ -431,20 +446,23 @@
 
                             <!-- GCash -->
 
-                            <label class="checkout-payment-option">
+                            <label class="checkout-payment-option"
+                                          for="paymentGcash">
 
-                                <input type="radio"
-                                       name="paymentMethod"
-                                       value="GCash">
+                                     <input
+                                            id="paymentGcash"
+                                            type="radio"
+                                             name="paymentMethod"
+                                            value="GCash">
 
                                 <span class="checkout-payment-card">
 
                                     <span class="checkout-payment-select">
-                                        <i class="bi bi-check"></i>
+                                        <i class="bi bi-check" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-icon mobile">
-                                        <i class="bi bi-phone"></i>
+                                        <i class="bi bi-phone" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-content">
@@ -463,20 +481,23 @@
 
                             <!-- PayPal -->
 
-                            <label class="checkout-payment-option">
+                            <label class="checkout-payment-option"
+                                        for="paymentPaypal">
 
-                                <input type="radio"
-                                       name="paymentMethod"
-                                       value="PayPal">
+                                       <input
+                                           id="paymentPaypal"
+                                          type="radio"
+                                           name="paymentMethod"
+                                           value="PayPal">
 
                                 <span class="checkout-payment-card">
 
                                     <span class="checkout-payment-select">
-                                        <i class="bi bi-check"></i>
+                                        <i class="bi bi-check" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-icon paypal">
-                                        <i class="bi bi-paypal"></i>
+                                        <i class="bi bi-paypal" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-content">
@@ -495,20 +516,23 @@
 
                             <!-- Credit or Debit Card -->
 
-                            <label class="checkout-payment-option">
+                            <label class="checkout-payment-option"
+                                             for="paymentCard">
 
-                                <input type="radio"
-                                       name="paymentMethod"
-                                       value="Credit/Debit Card">
+                                                  <input
+                                                       id="paymentCard" 
+                                                        type="radio"
+                                                           name="paymentMethod"
+                                                              value="Credit/Debit Card">
 
                                 <span class="checkout-payment-card">
 
                                     <span class="checkout-payment-select">
-                                        <i class="bi bi-check"></i>
+                                        <i class="bi bi-check" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-icon card">
-                                        <i class="bi bi-credit-card-2-front"></i>
+                                        <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
                                     </span>
 
                                     <span class="checkout-payment-content">
@@ -527,9 +551,10 @@
 
                         </div>
 
-                        <div class="checkout-payment-notice">
+                        <div class="checkout-payment-notice"
+                             role="note">
 
-                            <i class="bi bi-info-circle-fill"></i>
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
 
                             <p>
                                 Online payment options are displayed as
@@ -547,18 +572,20 @@
 
                 <div class="checkout-mobile-actions d-lg-none">
 
-                    <button type="submit"
-                            class="btn btn-warning checkout-place-order-button">
+                   <button type="submit"
+            class="btn place-order-btn btn-store-primary"
+            data-loading-button
+            data-loading-text="Processing Order...">
 
-                        <i class="bi bi-bag-check-fill me-2"></i>
+                        <i class="bi bi-bag-check-fill me-2" aria-hidden="true"></i>
                         Place Order
 
                     </button>
 
                     <a th:href="@{/cart}"
-                       class="btn checkout-return-cart-button">
+                       class="btn checkout-return-cart-button btn-store-secondary">
 
-                        <i class="bi bi-arrow-left me-2"></i>
+                        <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
                         Return to Cart
 
                     </a>
@@ -571,7 +598,8 @@
 
             <div class="col-lg-4">
 
-                <aside class="checkout-summary-card">
+                <aside class="checkout-summary-card store-card"
+                      aria-labelledby="checkoutSummaryTitle">
 
                     <div class="checkout-summary-header">
 
@@ -579,11 +607,13 @@
 
                             <span>Review your purchase</span>
 
-                            <h2>Order Summary</h2>
+                            <h2 id="checkoutSummaryTitle">
+                              Order Summary
+                                   </h2>
 
                         </div>
 
-                        <i class="bi bi-receipt"></i>
+                        <i class="bi bi-receipt" aria-hidden="true"></i>
 
                     </div>
 
@@ -608,7 +638,8 @@
 
                                     <i th:unless="${item.product.imageUrl != null
                                                   and !#strings.isEmpty(item.product.imageUrl)}"
-                                       class="bi bi-image">
+                                       class="bi bi-image"
+                                       aria-hidden="true">
                                     </i>
 
                                 </div>
@@ -743,24 +774,27 @@
                         <!-- Desktop Submit Button -->
 
                         <button type="submit"
-                                class="btn btn-warning checkout-place-order-button d-none d-lg-block">
+                                 class="btn place-order-btn"
+                                  data-loading-button
+                                   data-loading-text="Processing Order...">
 
-                            <i class="bi bi-bag-check-fill me-2"></i>
+                            <i class="bi bi-bag-check-fill me-2" aria-hidden="true"></i>
                             Place Order
 
                         </button>
 
                         <a th:href="@{/cart}"
-                           class="btn checkout-return-cart-button d-none d-lg-block">
+                           class="btn checkout-return-cart-button btn-store-secondary d-none d-lg-block">
 
-                            <i class="bi bi-arrow-left me-2"></i>
+                            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
                             Return to Cart
 
                         </a>
 
-                        <div class="checkout-security-box">
+                        <div class="checkout-security-box"
+                             role="status">
 
-                            <i class="bi bi-shield-check"></i>
+                            <i class="bi bi-shield-check" aria-hidden="true"></i>
 
                             <div>
 
@@ -781,11 +815,13 @@
 
                 <!-- Checkout Benefits -->
 
-                <div class="checkout-benefits-card">
+               <div class="checkout-benefits-card store-card">
 
-                    <div class="checkout-benefit">
+                    <div class="checkout-benefit"
+                         role="group"
+                         aria-label="Reliable delivery benefit">
 
-                        <i class="bi bi-truck"></i>
+                        <i class="bi bi-truck" aria-hidden="true"></i>
 
                         <div>
 
@@ -799,9 +835,11 @@
 
                     </div>
 
-                    <div class="checkout-benefit">
+                    <div class="checkout-benefit"
+                         role="group"
+                         aria-label="Verified account benefit">
 
-                        <i class="bi bi-person-check"></i>
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
 
                         <div>
 
@@ -815,9 +853,11 @@
 
                     </div>
 
-                    <div class="checkout-benefit">
+                    <div class="checkout-benefit"
+                         role="group"
+                         aria-label="Customer support benefit">
 
-                        <i class="bi bi-headset"></i>
+                        <i class="bi bi-headset" aria-hidden="true"></i>
 
                         <div>
 
@@ -843,6 +883,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
 </script>
-
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
 </body>
 </html>

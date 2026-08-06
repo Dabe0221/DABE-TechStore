@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="toastContainer"
+     class="store-toast-container"
+     aria-live="polite"
+     aria-atomic="true">
+
+    <!-- Success toast -->
+
+    <div th:if="${successMessage}"
+         class="store-toast store-toast-success"
+         role="status"
+         data-store-toast>
+
+        <div class="store-toast-icon">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+
+        <div class="store-toast-content">
+            <strong>Success</strong>
+
+            <p th:text="${successMessage}">
+                Action completed successfully.
+            </p>
+        </div>
+
+        <button type="button"
+                class="store-toast-close"
+                aria-label="Close notification"
+                data-toast-close>
+
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <span class="store-toast-progress"></span>
+    </div>
+
+    <!-- Error toast -->
+
+    <div th:if="${errorMessage}"
+         class="store-toast store-toast-error"
+         role="alert"
+         data-store-toast>
+
+        <div class="store-toast-icon">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+        </div>
+
+        <div class="store-toast-content">
+            <strong>Something went wrong</strong>
+
+            <p th:text="${errorMessage}">
+                The action could not be completed.
+            </p>
+        </div>
+
+        <button type="button"
+                class="store-toast-close"
+                aria-label="Close notification"
+                data-toast-close>
+
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <span class="store-toast-progress"></span>
+    </div>
+
+    <!-- Warning toast -->
+
+    <div th:if="${warningMessage}"
+         class="store-toast store-toast-warning"
+         role="alert"
+         data-store-toast>
+
+        <div class="store-toast-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+
+        <div class="store-toast-content">
+            <strong>Attention</strong>
+
+            <p th:text="${warningMessage}">
+                Please review this information.
+            </p>
+        </div>
+
+        <button type="button"
+                class="store-toast-close"
+                aria-label="Close notification"
+                data-toast-close>
+
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <span class="store-toast-progress"></span>
+    </div>
+
+    <!-- Information toast -->
+
+    <div th:if="${infoMessage}"
+         class="store-toast store-toast-info"
+         role="status"
+         data-store-toast>
+
+        <div class="store-toast-icon">
+            <i class="bi bi-info-circle-fill"></i>
+        </div>
+
+        <div class="store-toast-content">
+            <strong>Information</strong>
+
+            <p th:text="${infoMessage}">
+                Here is some useful information.
+            </p>
+        </div>
+
+        <button type="button"
+                class="store-toast-close"
+                aria-label="Close notification"
+                data-toast-close>
+
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <span class="store-toast-progress"></span>
+    </div>
+
+</div>
+
+</body>
+</html>

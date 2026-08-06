@@ -12,6 +12,7 @@ import com.ecommerce.demo_ecommerce.entity.OrderItem;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.ecommerce.demo_ecommerce.entity.Product;
@@ -19,6 +20,7 @@ import com.ecommerce.demo_ecommerce.repository.ProductRepository;
 import com.ecommerce.demo_ecommerce.service.EmailService;
 import com.ecommerce.demo_ecommerce.service.NotificationService;
 import com.ecommerce.demo_ecommerce.service.InventoryMovementService;
+
 
 
 import java.util.List;
@@ -50,10 +52,15 @@ public class CheckoutController {
     }
 
     @GetMapping("/checkout")
-    public String checkoutPage(HttpSession session, Model model) {
+    public String checkoutPage(HttpSession session, Model model,RedirectAttributes redirectAttributes) {
         ShoppingCart cart = getCart(session);
 
         if (cart == null || cart.getItems().isEmpty()) {
+
+             redirectAttributes.addFlashAttribute(
+            "warningMessage",
+            "Your cart is empty."
+    );
             return "redirect:/cart";
         }
 
@@ -67,7 +74,7 @@ public class CheckoutController {
 @PostMapping("/checkout/place-order")
 
 
-public String placeOrder(@ModelAttribute Order order, HttpSession session) {
+public String placeOrder(@ModelAttribute Order order, HttpSession session,RedirectAttributes redirectAttributes) {
 
     ShoppingCart cart = getCart(session);
     
@@ -94,6 +101,7 @@ if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
 } else {
     order.setPaymentStatus("Pending Payment");
 }
+
 
     
 
@@ -128,16 +136,26 @@ List<Integer> quantityList = new ArrayList<>();
     }
 
     if (product.getStock() < cartItem.getQuantity()) {
+
+ redirectAttributes.addFlashAttribute(
+            "warningMessage",
+            product.getName()
+                    + " does not have enough stock. Only "
+                    + product.getStock()
+                    + " item(s) are available."
+    );
+
         return "redirect:/cart";
     }
 
     OrderItem item = new OrderItem();
 
-    item.setProductName(product.getName());
-    item.setPrice(product.getPrice());
-    item.setQuantity(cartItem.getQuantity());
-    item.setSubtotal(cartItem.getSubtotal());
-    item.setOrder(order);
+item.setProductName(product.getName());
+item.setPrice(product.getPrice());
+item.setQuantity(cartItem.getQuantity());
+item.setSubtotal(cartItem.getSubtotal());
+item.setImageUrl(product.getImageUrl());
+item.setOrder(order);
 
   int stockBefore = product.getStock();
 int stockAfter = stockBefore - cartItem.getQuantity();
@@ -209,7 +227,7 @@ if ("Cash on Delivery".equalsIgnoreCase(order.getPaymentMethod())) {
 
     emailService.sendOrderConfirmation(
             order.getEmail(),
-            order.getId(),
+            savedOrder.getId(),
             order.getCustomerName(),
             order.getPaymentMethod(),
             order.getPaymentStatus(),
@@ -217,14 +235,20 @@ if ("Cash on Delivery".equalsIgnoreCase(order.getPaymentMethod())) {
     );
 
     session.removeAttribute("cart");
+    
 
     return "redirect:/order-success";
 }
 
 session.removeAttribute("cart");
 
+ redirectAttributes.addFlashAttribute(
+            "successMessage",
+            "Your order was placed successfully."
+    );
 
-return "redirect:/payment/" + order.getId();
+
+return "redirect:/payment/" + savedOrder.getId();
 
     
 }
@@ -249,7 +273,7 @@ public String paymentPage(@PathVariable Long id, Model model) {
 }
 
 @PostMapping("/payment/{id}/pay")
-public String payOrder(@PathVariable Long id) {
+public String payOrder(@PathVariable Long id,RedirectAttributes redirectAttributes) {
 
     Order order = orderRepository.findById(id).orElse(null);
 
@@ -275,6 +299,11 @@ public String payOrder(@PathVariable Long id) {
         order.getPaymentStatus(),
         order.getStatus()
 );
+
+ redirectAttributes.addFlashAttribute(
+            "successMessage",
+            "Your payment was completed successfully."
+    );
 
     return "redirect:/payment/" + id + "/success";
 }

@@ -74,7 +74,7 @@ public String increaseQuantity(@PathVariable Long id,
         return "redirect:/cart";
     }
 
-    @GetMapping("/cart/remove/{id}")
+    @PostMapping("/cart/remove/{id}")
     public String removeFromCart(@PathVariable Long id, HttpSession session) {
         getCart(session).removeProduct(id);
         return "redirect:/cart";
@@ -94,6 +94,16 @@ public String addToCartWithQuantity(
                 "error",
                 "Product is out of stock."
         );
+
+         redirectAttributes.addFlashAttribute(
+            "successMessage",
+            "The product was added to your cart."
+    );
+
+redirectAttributes.addFlashAttribute(
+        "warningMessage",
+        "The requested quantity is greater than the available stock."
+);    
 
         return "redirect:/";
     }

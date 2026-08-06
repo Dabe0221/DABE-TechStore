@@ -49,7 +49,7 @@
             th:href="@{/}"
         >
             <span class="product-store-logo">
-                <i class="bi bi-cpu-fill"></i>
+                <i class="bi bi-cpu-fill" aria-hidden="true"></i>
             </span>
 
             <span>
@@ -61,14 +61,14 @@
             th:href="@{/}"
             class="btn product-back-button"
         >
-            <i class="bi bi-arrow-left me-2"></i>
+            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
             Back to Store
         </a>
 
     </div>
 
 </nav>
-
+<div th:replace="~{fragments/toast :: toastContainer}"></div>
 
 <!-- ================= BREADCRUMB ================= -->
 
@@ -108,7 +108,8 @@
 
 <main class="container product-details-container">
 
-    <section class="product-details-card">
+    <section class="product-details-card store-card"
+              aria-labelledby="productTitle">
 
         <div class="row g-0">
 
@@ -121,24 +122,27 @@
                     <span
                         class="product-details-stock-label in-stock"
                         th:if="${product.stock != null and product.stock > 5}"
+                        role="status"
                     >
-                        <i class="bi bi-check-circle-fill"></i>
+                        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
                         In Stock
                     </span>
 
                     <span
                         class="product-details-stock-label low-stock"
                         th:if="${product.stock != null and product.stock > 0 and product.stock <= 5}"
+                        role="status"
                     >
-                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
                         Low Stock
                     </span>
 
                     <span
                         class="product-details-stock-label out-of-stock"
                         th:if="${product.stock == null or product.stock <= 0}"
+                        role="status"
                     >
-                        <i class="bi bi-x-circle-fill"></i>
+                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
                         Out of Stock
                     </span>
 
@@ -155,7 +159,7 @@
                             th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
                             class="product-details-image-placeholder"
                         >
-                            <i class="bi bi-image"></i>
+                            <i class="bi bi-image" aria-hidden="true"></i>
 
                             <span>
                                 No product image
@@ -167,17 +171,17 @@
                     <div class="product-image-feature-list">
 
                         <div>
-                            <i class="bi bi-shield-check"></i>
+                            <i class="bi bi-shield-check" aria-hidden="true"></i>
                             Secure purchase
                         </div>
 
                         <div>
-                            <i class="bi bi-box-seam"></i>
+                            <i class="bi bi-box-seam" aria-hidden="true"></i>
                             Quality product
                         </div>
 
                         <div>
-                            <i class="bi bi-arrow-repeat"></i>
+                            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
                             Easy ordering
                         </div>
 
@@ -193,15 +197,16 @@
 
                 <div class="product-details-information">
 
-                    <span
-                        class="product-details-category"
-                        th:text="${product.category != null ? product.category : 'Technology'}"
-                    >
-                        Technology
-                    </span>
+                   <span
+                       class="product-details-category section-label"
+                      th:text="${product.category != null ? product.category : 'Technology'}"
+>
+                                 Technology
+                           </span>
 
                     <h1
-                        class="product-details-title"
+                        id="productTitle"
+                        class="product-details-title page-title"
                         th:text="${product.name}"
                     >
                         Product Name
@@ -211,7 +216,8 @@
                     <!-- Average rating -->
                     <div class="product-details-rating-row">
 
-                        <div class="product-details-stars">
+                        <div class="product-details-stars"
+                                     aria-hidden="true">
 
                             <span
                                 th:each="number : ${#numbers.sequence(1, 5)}"
@@ -233,6 +239,14 @@
                             out of 5
 
                         </span>
+
+                        <span class="visually-hidden"
+                           th:text="'Rated ' +
+                              ${#numbers.formatDecimal(averageRating, 1, 1)} +
+                                ' out of 5 based on ' +
+                                  ${#lists.size(reviews)} +
+                                 ' reviews'">
+                               </span>
 
                         <a
                             href="#customer-reviews"
@@ -271,18 +285,20 @@
 
 
                     <!-- Availability -->
-                    <div class="product-availability-panel">
+                    <div class="product-availability-panel"
+                                 role="status">
 
                         <div class="product-availability-icon">
 
                             <i
                                 class="bi bi-check-circle-fill"
                                 th:if="${product.stock != null and product.stock > 0}"
-                            ></i>
+                                 aria-hidden="true"></i>
 
                             <i
                                 class="bi bi-x-circle-fill text-danger"
                                 th:if="${product.stock == null or product.stock <= 0}"
+                                aria-hidden="true"
                             ></i>
 
                         </div>
@@ -328,6 +344,7 @@
                         th:action="@{/cart/add/{id}(id=${product.id})}"
                         method="post"
                         class="product-purchase-form"
+                         data-loading-form
                     >
 
                         <label
@@ -347,17 +364,20 @@
                                     onclick="decreaseQty()"
                                     aria-label="Decrease quantity"
                                 >
-                                    <i class="bi bi-dash"></i>
+                                    <i class="bi bi-dash" aria-hidden="true"></i>
                                 </button>
 
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="quantity"
                                     name="quantity"
                                     value="1"
+                                    min="1"
+                                    th:max="${product.stock}"
                                     class="quantity-input"
-                                    readonly
-                                >
+                                    inputmode="numeric"
+                                    aria-live="polite"
+                                    readonly>
 
                                 <button
                                     type="button"
@@ -366,16 +386,18 @@
                                     onclick="increaseQty(this)"
                                     aria-label="Increase quantity"
                                 >
-                                    <i class="bi bi-plus"></i>
+                                    <i class="bi bi-plus" aria-hidden="true"></i>
                                 </button>
 
                             </div>
 
                             <button
                                 type="submit"
-                                class="btn product-add-cart-button"
-                            >
-                                <i class="bi bi-cart-plus me-2"></i>
+                                class="btn product-add-cart-button btn-store-primary"
+                                data-loading-button
+                                data-loading-text="Adding to Cart...">
+
+                                <i class="bi bi-cart-plus me-2" aria-hidden="true"></i>
                                 Add to Cart
                             </button>
 
@@ -386,14 +408,18 @@
 
                     <!-- Wishlist -->
                     <form th:action="@{/wishlist/add/{id}(id=${product.id})}"
-      method="post"
-      sec:authorize="isAuthenticated()"
-      class="product-wishlist-form">
+                          method="post"
+                          sec:authorize="isAuthenticated()"
+                          class="product-wishlist-form"
+                          data-loading-form>
 
     <button type="submit"
-            class="btn product-details-wishlist-button">
+            class="btn product-details-wishlist-button btn-store-secondary"
+            data-loading-button
+            data-loading-text="Adding..."
+            th:aria-label="'Add ' + ${product.name} + ' to wishlist'">
 
-        <i class="bi bi-heart me-2"></i>
+        <i class="bi bi-heart me-2" aria-hidden="true"></i>
         Add to Wishlist
 
     </button>
@@ -402,14 +428,17 @@
 
 
                     <!-- Login required for wishlist -->
-                    <a
-                        th:href="@{/login}"
-                        sec:authorize="!isAuthenticated()"
-                        class="btn product-details-wishlist-button"
-                    >
-                        <i class="bi bi-heart me-2"></i>
+                   <a th:href="@{/login}"
+                   sec:authorize="!isAuthenticated()"
+                   class="btn product-details-wishlist-button btn-store-secondary"
+                   th:aria-label="'Log in to add ' + ${product.name} + ' to wishlist'">
+
+                       <i class="bi bi-heart me-2"
+                       aria-hidden="true"></i>
+
                         Login to Add to Wishlist
-                    </a>
+
+                          </a>
 
 
                     <!-- Sold out -->
@@ -417,8 +446,9 @@
                         th:if="${product.stock == null or product.stock <= 0}"
                         class="btn product-sold-out-button"
                         disabled
-                    >
-                        <i class="bi bi-x-circle me-2"></i>
+                        aria-disabled="true">
+
+                        <i class="bi bi-x-circle me-2" aria-hidden="true"></i>
                         Sold Out
                     </button>
 
@@ -428,7 +458,7 @@
 
                         <div class="product-service-item">
 
-                            <i class="bi bi-shield-lock"></i>
+                            <i class="bi bi-shield-lock" aria-hidden="true"></i>
 
                             <div>
                                 <strong>
@@ -444,7 +474,7 @@
 
                         <div class="product-service-item">
 
-                            <i class="bi bi-truck"></i>
+                            <i class="bi bi-truck" aria-hidden="true"></i>
 
                             <div>
                                 <strong>
@@ -492,34 +522,39 @@
 
             <div class="product-rating-summary">
 
-                <strong
-                    th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"
-                >
-                    0.0
-                </strong>
+    <strong th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">
+        0.0
+    </strong>
 
-                <div>
+    <div>
 
-                    <div class="product-summary-stars">
+        <div class="product-summary-stars"
+             aria-hidden="true">
 
-                        <span
-                            th:each="number : ${#numbers.sequence(1, 5)}"
-                            th:text="${number <= averageRating ? '★' : '☆'}"
-                        >
-                            ★
-                        </span>
+            <span th:each="number : ${#numbers.sequence(1, 5)}"
+                  th:text="${number <= averageRating ? '★' : '☆'}">
+                ★
+            </span>
 
-                    </div>
+        </div>
 
-                    <small>
-                        Based on
-                        <span th:text="${#lists.size(reviews)}">0</span>
-                        reviews
-                    </small>
+        <small>
+            Based on
+            <span th:text="${#lists.size(reviews)}">0</span>
+            reviews
+        </small>
 
-                </div>
+        <span class="visually-hidden"
+              th:text="'Average rating: ' +
+                       ${#numbers.formatDecimal(averageRating, 1, 1)} +
+                       ' out of 5, based on ' +
+                       ${#lists.size(reviews)} +
+                       ' reviews'">
+        </span>
 
-            </div>
+    </div>
+
+</div>
 
         </div>
 
@@ -530,12 +565,12 @@
             <div class="col-lg-5">
 
                 <div
-                    class="review-form-card"
+                    class="review-form-card store-card"
                     sec:authorize="isAuthenticated()"
                 >
 
                     <div class="review-form-icon">
-                        <i class="bi bi-chat-square-heart"></i>
+                        <i class="bi bi-chat-square-heart" aria-hidden="true"></i>
                     </div>
 
                     <h3>
@@ -549,72 +584,84 @@
                     <form
                         th:action="@{/product/{id}/review(id=${product.id})}"
                         method="post"
+                        data-loading-form
                     >
 
-                        <div class="mb-3">
+                       <div class="mb-3">
 
-                            <label
-                                for="rating"
-                                class="form-label"
-                            >
-                                Rating
-                            </label>
+    <label for="rating"
+           class="form-label">
+        Rating
+    </label>
 
-                            <select
-                                id="rating"
-                                name="rating"
-                                class="form-select product-form-control"
-                                required
-                            >
-                                <option value="5">
-                                    ★★★★★ — Excellent
-                                </option>
+    <select id="rating"
+            name="rating"
+            class="form-select product-form-control store-input"
+            aria-describedby="ratingHelp"
+            required>
 
-                                <option value="4">
-                                    ★★★★☆ — Good
-                                </option>
+        <option value="5">
+            ★★★★★ — Excellent
+        </option>
 
-                                <option value="3">
-                                    ★★★☆☆ — Average
-                                </option>
+        <option value="4">
+            ★★★★☆ — Good
+        </option>
 
-                                <option value="2">
-                                    ★★☆☆☆ — Poor
-                                </option>
+        <option value="3">
+            ★★★☆☆ — Average
+        </option>
 
-                                <option value="1">
-                                    ★☆☆☆☆ — Bad
-                                </option>
+        <option value="2">
+            ★★☆☆☆ — Poor
+        </option>
 
-                            </select>
+        <option value="1">
+            ★☆☆☆☆ — Bad
+        </option>
 
-                        </div>
+    </select>
 
-                        <div class="mb-3">
+    <small id="ratingHelp"
+           class="form-text">
+        Choose a rating from 1 to 5 stars.
+    </small>
 
-                            <label
-                                for="comment"
-                                class="form-label"
-                            >
-                                Comment
-                            </label>
+</div>
 
-                            <textarea
-                                id="comment"
-                                name="comment"
-                                class="form-control product-form-control"
-                                rows="5"
-                                placeholder="What did you like or dislike about this product?"
-                                required
-                            ></textarea>
+                       <div class="mb-3">
 
-                        </div>
+    <label for="comment"
+           class="form-label">
+        Comment
+    </label>
+
+    <textarea id="comment"
+              name="comment"
+              class="form-control product-form-control store-input"
+              rows="5"
+              minlength="5"
+              maxlength="1000"
+              aria-describedby="commentHelp"
+              placeholder="What did you like or dislike about this product?"
+              required></textarea>
+
+    <small id="commentHelp"
+           class="form-text">
+        Write between 5 and 1,000 characters.
+    </small>
+
+</div>
+
+                    
 
                         <button
                             type="submit"
-                            class="btn product-submit-review-button"
+                            class="btn product-submit-review-button btn-store-primary"
+                            data-loading-button
+                             data-loading-text="Submitting Review..."
                         >
-                            <i class="bi bi-send me-2"></i>
+                            <i class="bi bi-send me-2" aria-hidden="true"></i>
                             Submit Review
                         </button>
 
@@ -625,10 +672,10 @@
 
                 <div
                     sec:authorize="!isAuthenticated()"
-                    class="review-login-card"
+                    class="review-login-card store-card"
                 >
 
-                    <i class="bi bi-person-lock"></i>
+                    <i class="bi bi-person-lock" aria-hidden="true"></i>
 
                     <h3>
                         Login Required
@@ -640,7 +687,7 @@
 
                     <a
                         th:href="@{/login}"
-                        class="btn btn-primary"
+                        class="btn btn-store-primary"
                     >
                         Login to Review
                     </a>
@@ -656,9 +703,9 @@
                 <div
                     th:if="${reviews == null or #lists.isEmpty(reviews)}"
                     class="product-no-reviews"
-                >
+                    role="status">
 
-                    <i class="bi bi-chat-left-text"></i>
+                    <i class="bi bi-chat-left-text" aria-hidden="true"></i>
 
                     <h3>
                         No reviews yet
@@ -673,7 +720,7 @@
 
                 <div
                     th:each="review : ${reviews}"
-                    class="product-review-card"
+                    class="product-review-card store-card"
                 >
 
                     <div class="product-review-header">
@@ -704,7 +751,7 @@
 
                         </div>
 
-                        <div class="product-review-stars">
+                        <div class="product-review-stars" aria-hidden="true">
 
                             <span
                                 th:each="number : ${#numbers.sequence(1, 5)}"
@@ -714,6 +761,10 @@
                             </span>
 
                         </div>
+
+                        <span class="visually-hidden"
+                              th:text="'Rated ' + ${review.rating} + ' out of 5'">
+                           </span>
 
                     </div>
 
@@ -759,7 +810,7 @@
                 class="product-view-all-link"
             >
                 View all products
-                <i class="bi bi-arrow-right"></i>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
             </a>
 
         </div>
@@ -772,12 +823,12 @@
                 th:each="item : ${relatedProducts}"
             >
 
-                <article class="related-product-card">
+                <article class="related-product-card store-card store-hover">
 
                     <a
                         th:href="@{/product/{id}(id=${item.id})}"
                         class="related-product-image-link"
-                    >
+                         >
 
                         <img
                             th:if="${item.imageUrl != null and !#strings.isEmpty(item.imageUrl)}"
@@ -790,7 +841,7 @@
                             th:unless="${item.imageUrl != null and !#strings.isEmpty(item.imageUrl)}"
                             class="related-product-placeholder"
                         >
-                            <i class="bi bi-image"></i>
+                            <i class="bi bi-image" aria-hidden="true"></i>
                         </div>
 
                     </a>
@@ -827,10 +878,10 @@
 
                             <a
                                 th:href="@{/product/{id}(id=${item.id})}"
-                                class="related-product-view-button"
-                                aria-label="View product"
+                                class="related-product-view-button btn-store-secondary"
+                                th:aria-label="'View details for ' + ${item.name}"
                             >
-                                <i class="bi bi-arrow-right"></i>
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
                             </a>
 
                         </div>
@@ -919,7 +970,12 @@
         }
     }
 
+
+
 </script>
+
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/loading-buttons.js}"></script>
 
 </body>
 </html>
